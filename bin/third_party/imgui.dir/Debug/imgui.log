@@ -1,0 +1,10 @@
+﻿  Building Custom Rule D:/Desktop/Humber/VI/Capstone/CapstoneProject/third_party/CMakeLists.txt
+  imgui.cpp
+  imgui_demo.cpp
+  imgui_draw.cpp
+  imgui_widgets.cpp
+  imgui_tables.cpp
+  imgui_impl_vulkan.cpp
+  imgui_impl_sdl2.cpp
+  Generating Code...
+  imgui.vcxproj -> D:\Desktop\Humber\VI\Capstone\CapstoneProject\bin\third_party\Debug\imgui.lib

@@ -1,0 +1,6 @@
+/third_party/*
+/bin/x64/*
+/bin/CMakeFiles/*
+/bin/Debug/*
+/bin/.vs/
+/assets/brickadia

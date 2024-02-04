@@ -1,0 +1,37 @@
+# CMake generation dependency list for this directory.
+C:/Program Files/CMake/share/cmake-3.28/Modules/CMakeDependentOption.cmake
+C:/Program Files/CMake/share/cmake-3.28/Modules/CMakeParseArguments.cmake
+C:/Program Files/CMake/share/cmake-3.28/Modules/CMakePushCheckState.cmake
+C:/Program Files/CMake/share/cmake-3.28/Modules/CheckCCompilerFlag.cmake
+C:/Program Files/CMake/share/cmake-3.28/Modules/CheckCSourceCompiles.cmake
+C:/Program Files/CMake/share/cmake-3.28/Modules/CheckCSourceRuns.cmake
+C:/Program Files/CMake/share/cmake-3.28/Modules/CheckCXXCompilerFlag.cmake
+C:/Program Files/CMake/share/cmake-3.28/Modules/CheckCXXSourceCompiles.cmake
+C:/Program Files/CMake/share/cmake-3.28/Modules/CheckIncludeFile.cmake
+C:/Program Files/CMake/share/cmake-3.28/Modules/CheckIncludeFiles.cmake
+C:/Program Files/CMake/share/cmake-3.28/Modules/CheckLanguage.cmake
+C:/Program Files/CMake/share/cmake-3.28/Modules/CheckLibraryExists.cmake
+C:/Program Files/CMake/share/cmake-3.28/Modules/CheckSourceCompiles.cmake
+C:/Program Files/CMake/share/cmake-3.28/Modules/CheckStructHasMember.cmake
+C:/Program Files/CMake/share/cmake-3.28/Modules/CheckSymbolExists.cmake
+C:/Program Files/CMake/share/cmake-3.28/Modules/FindGit.cmake
+C:/Program Files/CMake/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake
+C:/Program Files/CMake/share/cmake-3.28/Modules/FindPackageMessage.cmake
+C:/Program Files/CMake/share/cmake-3.28/Modules/FindPkgConfig.cmake
+C:/Program Files/CMake/share/cmake-3.28/Modules/GNUInstallDirs.cmake
+C:/Program Files/CMake/share/cmake-3.28/Modules/Internal/CheckCompilerFlag.cmake
+C:/Program Files/CMake/share/cmake-3.28/Modules/Internal/CheckSourceCompiles.cmake
+C:/Program Files/CMake/share/cmake-3.28/Modules/Internal/CheckSourceRuns.cmake
+D:/Desktop/Humber/VI/Capstone/CapstoneProject/bin/third_party/SDL/SDL_config.h.intermediate
+D:/Desktop/Humber/VI/Capstone/CapstoneProject/third_party/SDL/CMakeLists.txt
+D:/Desktop/Humber/VI/Capstone/CapstoneProject/third_party/SDL/SDL2.spec.in
+D:/Desktop/Humber/VI/Capstone/CapstoneProject/third_party/SDL/cmake/CheckCPUArchitecture.cmake
+D:/Desktop/Humber/VI/Capstone/CapstoneProject/third_party/SDL/cmake/macros.cmake
+D:/Desktop/Humber/VI/Capstone/CapstoneProject/third_party/SDL/cmake/sdlchecks.cmake
+D:/Desktop/Humber/VI/Capstone/CapstoneProject/third_party/SDL/cmake/sdlfind.cmake
+D:/Desktop/Humber/VI/Capstone/CapstoneProject/third_party/SDL/cmake/sdlplatform.cmake
+D:/Desktop/Humber/VI/Capstone/CapstoneProject/third_party/SDL/cmake_uninstall.cmake.in
+D:/Desktop/Humber/VI/Capstone/CapstoneProject/third_party/SDL/include/SDL_config.h.cmake
+D:/Desktop/Humber/VI/Capstone/CapstoneProject/third_party/SDL/include/SDL_revision.h.cmake
+D:/Desktop/Humber/VI/Capstone/CapstoneProject/third_party/SDL/sdl2-config.in
+D:/Desktop/Humber/VI/Capstone/CapstoneProject/third_party/SDL/sdl2.pc.in

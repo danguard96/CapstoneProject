@@ -1,2 +1,4 @@
-/.vs
-/x64
+/.vs/ComponentFramework
+/Debug
+/ComponentFramework/Debug
+/ComponentFramework/x64

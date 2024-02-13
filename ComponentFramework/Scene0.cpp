@@ -65,6 +65,18 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 		case SDL_SCANCODE_D:
 			right = true;
 			break;
+		case SDL_SCANCODE_UP:
+			lookUp = true;
+			break;
+		case SDL_SCANCODE_DOWN:
+			lookDown = true;
+			break;
+		case SDL_SCANCODE_LEFT:
+			lookLeft = true;
+			break;
+		case SDL_SCANCODE_RIGHT:
+			lookRight = true;
+			break;
 		case SDL_SCANCODE_1:
 			skin = 0;
 			break;
@@ -90,6 +102,18 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 		case SDL_SCANCODE_D:
 			right = false;
 			break;
+		case SDL_SCANCODE_UP:
+			lookUp = false;
+			break;
+		case SDL_SCANCODE_DOWN:
+			lookDown = false;
+			break;
+		case SDL_SCANCODE_LEFT:
+			lookLeft = false;
+			break;
+		case SDL_SCANCODE_RIGHT:
+			lookRight = false;
+			break;
 		}
 	case SDL_WINDOWEVENT:
 		switch (sdlEvent.window.event) {
@@ -104,21 +128,13 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 	}
 }
 void Scene0::Update(const float deltaTime) {
-	if (front)
+
+	if (front || back || left || right)
 	{
-		camera->SetViewMatrix(MMath::translate(0, 0, 0.1) * camera->GetViewMatrix());
-	}
-	if (back)
-	{
-		camera->SetViewMatrix(MMath::translate(0, 0, -0.1) * camera->GetViewMatrix());
-	}
-	if (left)
-	{
-		camera->SetViewMatrix(MMath::translate(0.1, 0, 0) * camera->GetViewMatrix());
-	}
-	if (right)
-	{
-		camera->SetViewMatrix(MMath::translate(-0.1, 0, 0) * camera->GetViewMatrix());
+		camera->SetViewMatrix(MMath::translate(left ? 0.1:0 + right ? -0.1:0, 0, front ? 0.1:0 + back ? -0.1:0) * camera->GetViewMatrix());
+	}	
+	if (lookUp || lookDown || lookLeft || lookRight) {
+		camera->SetViewMatrix(MMath::rotate(1, Vec3(lookUp ? -1:0 + lookDown ? 1:0, lookLeft ? -1:0 + lookRight ? 1:0, 0)) * camera->GetViewMatrix());
 	}
 	static float elapsedTime = 0.0f;
 	elapsedTime += deltaTime;

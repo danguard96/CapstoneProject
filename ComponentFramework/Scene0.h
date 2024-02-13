@@ -21,6 +21,10 @@ private:
 	bool back = false;
 	bool right = false;
 	bool left = false;
+	bool lookUp = false;
+	bool lookDown = false;
+	bool lookRight = false;
+	bool lookLeft = false;
 public:
 	explicit Scene0(Renderer* renderer_);
 	virtual ~Scene0();

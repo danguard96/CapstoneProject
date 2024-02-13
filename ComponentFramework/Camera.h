@@ -15,5 +15,6 @@ public:
 	void LookAt(const Vec3& eye, const Vec3& at, const Vec3& up);
 	inline Matrix4 GetProjectionMatrix() { return projection; }
 	inline Matrix4 GetViewMatrix() { return view; }
+	Matrix4 SetViewMatrix(Matrix4 _view) { return view = _view; }
 };
 

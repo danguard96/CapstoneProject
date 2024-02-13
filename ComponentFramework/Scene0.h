@@ -17,6 +17,10 @@ private:
 	Matrix4 SphereModelMatrix;
 	Matrix4 SphereRotationMatrix;
 	int skin = 0;
+	bool front = false;
+	bool back = false;
+	bool right = false;
+	bool left = false;
 public:
 	explicit Scene0(Renderer* renderer_);
 	virtual ~Scene0();

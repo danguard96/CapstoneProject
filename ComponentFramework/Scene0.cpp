@@ -39,7 +39,7 @@ bool Scene0::OnCreate() {
 	return true;
 }
 
-void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
+void Scene0::HandleEvents(const SDL_Event& sdlEvent) {	
 	if (sdlEvent.type == SDL_WINDOWEVENT) {
 		switch (sdlEvent.window.event) {
 		case SDL_WINDOWEVENT_SIZE_CHANGED:
@@ -53,6 +53,18 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 	switch (sdlEvent.type) {
 	case SDL_KEYDOWN:
 		switch (sdlEvent.key.keysym.scancode) {
+		case SDL_SCANCODE_W:
+			front = true;
+			break;
+		case SDL_SCANCODE_S:
+			back = true;
+			break;
+		case SDL_SCANCODE_A:
+			left = true;
+			break;
+		case SDL_SCANCODE_D:
+			right = true;
+			break;
 		case SDL_SCANCODE_1:
 			skin = 0;
 			break;
@@ -60,10 +72,25 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 			skin = 1;
 			break; 
 		case SDL_SCANCODE_3:
-				skin = 2;
-				break;
+			skin = 2;
+			break;
 		}
 		break;
+	case SDL_KEYUP:
+		switch (sdlEvent.key.keysym.scancode) {
+		case SDL_SCANCODE_W:
+			front = false;
+			break;
+		case SDL_SCANCODE_S:
+			back = false;
+			break;
+		case SDL_SCANCODE_A:
+			left = false;
+			break;
+		case SDL_SCANCODE_D:
+			right = false;
+			break;
+		}
 	case SDL_WINDOWEVENT:
 		switch (sdlEvent.window.event) {
 		case SDL_WINDOWEVENT_SIZE_CHANGED:
@@ -77,6 +104,22 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 	}
 }
 void Scene0::Update(const float deltaTime) {
+	if (front)
+	{
+		camera->SetViewMatrix(MMath::translate(0, 0, 0.1) * camera->GetViewMatrix());
+	}
+	if (back)
+	{
+		camera->SetViewMatrix(MMath::translate(0, 0, -0.1) * camera->GetViewMatrix());
+	}
+	if (left)
+	{
+		camera->SetViewMatrix(MMath::translate(0.1, 0, 0) * camera->GetViewMatrix());
+	}
+	if (right)
+	{
+		camera->SetViewMatrix(MMath::translate(-0.1, 0, 0) * camera->GetViewMatrix());
+	}
 	static float elapsedTime = 0.0f;
 	elapsedTime += deltaTime;
 	mariosModelMatrix = MMath::rotate(elapsedTime * 90.0f, Vec3(0.0f, 1.0f, 0.0f));

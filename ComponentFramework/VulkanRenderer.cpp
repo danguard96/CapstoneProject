@@ -49,7 +49,6 @@ void VulkanRenderer::Render() {
 
     updateCameraUniformBuffer(imageIndex);
     updateGLightsUniformBuffer(imageIndex);
-    updateNormalsUniformBuffer(imageIndex);
 
     if (imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
         vkWaitForFences(device, 1, &imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
@@ -138,9 +137,7 @@ void VulkanRenderer::initVulkan() {
     createImageViews();
     createRenderPass();
     createDescriptorSetLayout(descriptorSetLayout);
-    createDescriptorSetLayoutGeom(descriptorSetLayoutNormal);
     createGraphicsPipeline("shaders/assignment2.vert.spv", "shaders/assignment2.frag.spv", graphicsPipelineID, pipelineLayout);
-    createGraphicsPipelineGeom("shaders/drawNormals.vert.spv", "shaders/drawNormals.geom.spv", "shaders/drawNormals.frag.spv", graphicsPipelineIDNormal, pipelineLayoutNormal, descriptorSetLayoutNormal);
     createCommandPool();
     createDepthResources();
     createFramebuffers();
@@ -157,15 +154,12 @@ void VulkanRenderer::initVulkan() {
     loadModel("./meshes/Skull.obj", indexedBufferMemorySphere);
     createUniformBuffers(sizeof(CameraUBO), cameraBuffers, cameraBuffersMemory);
     createUniformBuffers(sizeof(GlobalLighting), glightingBuffers, glightingBuffersMemory);
-    createUniformBuffers(sizeof(NormalUBO), normalsBuffers, normalsBuffersMemory);
     createDescriptorPool(descriptorPoolArray[0]);
     createDescriptorPool(descriptorPoolArray[1]);
     createDescriptorSets(descriptorSetLayout, descriptorSetsArray[0], descriptorPoolArray[0], textureImageViewArray[0], textureSamplerArray[0]);
     createDescriptorSets(descriptorSetLayout, descriptorSetsArray[1], descriptorPoolArray[1], textureImageViewArray[1], textureSamplerArray[1]);
     createDescriptorPool(descriptorPoolSphere);
-    createDescriptorPoolGeom(descriptorPoolGeom);
     createDescriptorSets(descriptorSetLayout, descriptorSetsSphere, descriptorPoolSphere, textureImageViewSphere, textureSamplerSphere);
-    createDescriptorSetsGeom(descriptorSetLayoutNormal, descriptorSetsNormal, descriptorPoolGeom);
     createCommandBuffers();
     recordCommandBuffer();
     createSyncObjects();
@@ -283,20 +277,16 @@ void VulkanRenderer::recreateSwapChain() {
     createImageViews();
     createRenderPass();
     createGraphicsPipeline("shaders/assignment2.vert.spv", "shaders/assignemts.frag.spv", graphicsPipelineID, descriptorSetLayout);
-    createGraphicsPipelineGeom("shaders/drawNormals.vert.spv", "shaders/drawNormals.geom.spv", "shaders/drawNormals.frag.spv", graphicsPipelineIDNormal, pipelineLayoutNormal, descriptorSetLayoutNormal);
     createDepthResources();
     createFramebuffers();
     createUniformBuffers(sizeof(CameraUBO), cameraBuffers, cameraBuffersMemory);
     createUniformBuffers(sizeof(GlobalLighting), glightingBuffers, glightingBuffersMemory);
-    createUniformBuffers(sizeof(NormalUBO), normalsBuffers, normalsBuffersMemory);
     createDescriptorPool(descriptorPoolArray[0]);
     createDescriptorPool(descriptorPoolArray[1]);
     createDescriptorSets(descriptorSetLayout, descriptorSetsArray[0], descriptorPoolArray[0], textureImageViewArray[0], textureSamplerArray[0]);
     createDescriptorSets(descriptorSetLayout, descriptorSetsArray[1], descriptorPoolArray[1], textureImageViewArray[1], textureSamplerArray[1]);
     createDescriptorPool(descriptorPoolSphere);
-    createDescriptorPoolGeom(descriptorPoolGeom);
     createDescriptorSets(descriptorSetLayout, descriptorSetsSphere, descriptorPoolSphere, textureImageViewSphere, textureSamplerSphere);
-    createDescriptorSetsGeom(descriptorSetLayoutNormal, descriptorSetsNormal, descriptorPoolGeom);
     createCommandBuffers();
     recordCommandBuffer();
 }
@@ -1526,15 +1516,6 @@ void VulkanRenderer::recordCommandBuffer() {
         vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
         /// Choose the pipeline and bind it
-
-        vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipelineIDNormal);
-        vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayoutNormal, 0, 1, &descriptorSetsNormal[i], 0, nullptr);
-        vkCmdPushConstants(commandBuffers[i], pipelineLayoutNormal, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(ModelMatrixPushConst), &modelMatrixPushConst);
-        VkBuffer vertexBuffers2[] = { indexedBufferMemory.vertBufferID };
-        VkDeviceSize offsets2[] = { 0 };
-        vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers2, offsets2);
-        vkCmdBindIndexBuffer(commandBuffers[i], indexedBufferMemory.indexBufferID, 0, VK_INDEX_TYPE_UINT32);
-        vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indexedBufferMemory.indexBufferSize) / 4, 1, 0, 0, 0);
 
         vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipelineID);
         vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSetsSphere[i], 0, nullptr);

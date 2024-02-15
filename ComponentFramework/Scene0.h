@@ -8,9 +8,17 @@ using namespace MATH;
 /// Forward declarations 
 union SDL_Event;
 
+struct CameraPosition {
+	Vec3 position;
+	float theta;
+	float gamma;
+};
 
 class Scene0 : public Scene {
 private:
+	const float deg2rad = M_PI / 180;
+	const float rad2deg = 180 / M_PI;
+	CameraPosition cameraPosition;
 	Renderer *renderer;
 	Camera *camera;
 	Matrix4 mariosModelMatrix;
@@ -35,6 +43,7 @@ public:
 	virtual void Render() const override;
 	virtual void HandleEvents(const SDL_Event &sdlEvent) override;
 };
+
 
 
 #endif // SCENE0_H

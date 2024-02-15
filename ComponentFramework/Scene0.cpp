@@ -35,6 +35,7 @@ bool Scene0::OnCreate() {
 	case RendererType::OPENGL:
 		break;
 	}
+	cameraPosition = CameraPosition{Vec3{0,0,-5},1,0};
 
 	return true;
 }
@@ -128,16 +129,15 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 	}
 }
 void Scene0::Update(const float deltaTime) {
-
-	if (front || back || left || right)
-	{
-		camera->SetViewMatrix(MMath::translate(left ? 0.1:0 + right ? -0.1:0, 0, front ? 0.1:0 + back ? -0.1:0) * camera->GetViewMatrix());
-	}	
-	if (lookUp || lookDown || lookLeft || lookRight) {
-		camera->SetViewMatrix(MMath::rotate(1, Vec3(lookUp ? -1:0 + lookDown ? 1:0, lookLeft ? -1:0 + lookRight ? 1:0, 0)) * camera->GetViewMatrix());
-	}
+		
 	static float elapsedTime = 0.0f;
 	elapsedTime += deltaTime;
+	float fb = (front ? 0.1 : 0 + back ? -0.1 : 0) * 0.01;
+	float lr = (right ? 0.1 : 0 + left ? -0.1 : 0) * 0.01;
+	cameraPosition.position += (Vec3(-sin(cameraPosition.gamma * deg2rad),0,cos(cameraPosition.gamma * deg2rad)) * rad2deg * fb)
+		+ (Vec3(-sin((90 + cameraPosition.gamma) * deg2rad), 0, cos((90 + cameraPosition.gamma) * deg2rad)) * rad2deg * lr);
+	cameraPosition.theta += lookUp ? -2 : 0 + lookDown ? 2 : 0;
+	cameraPosition.gamma += lookLeft ? -2 : 0 + lookRight ? 2 : 0;
 	mariosModelMatrix = MMath::rotate(elapsedTime * 90.0f, Vec3(0.0f, 1.0f, 0.0f));
 	SphereRotationMatrix = MMath::rotate(elapsedTime * 90.0f, Vec3(0.0f, -1.0f, 0.0f));
 }
@@ -155,7 +155,9 @@ void Scene0::Render() const {
 		vRenderer = dynamic_cast<VulkanRenderer*>(renderer);
 		vRenderer->SetModelMatrixPush(mariosModelMatrix);
 		vRenderer->SetSphereModelMatrixPush(SphereRotationMatrix * SphereModelMatrix * mariosModelMatrix);
-		vRenderer->SetCameraUBO(camera->GetProjectionMatrix(), camera->GetViewMatrix());
+		vRenderer->SetCameraUBO(camera->GetProjectionMatrix(), MMath::rotate(cameraPosition.theta,Vec3(1,0,0)) 
+																	* MMath::rotate(cameraPosition.gamma, 0, 1, 0) 
+																	* MMath::translate(cameraPosition.position));
 		vRenderer->SetGLightsUBO(gl);
 		vRenderer->SetTextureIndex(skin);
 		vRenderer->Render();

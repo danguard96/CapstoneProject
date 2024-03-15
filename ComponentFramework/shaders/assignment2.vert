@@ -5,11 +5,6 @@ layout (location = 0) in  vec4 vVertex;
 layout (location = 1) in  vec4 vNormal;
 layout (location = 2) in  vec2 texCoords;
 
-struct lightUBO{
-	vec4 position;
-	vec4 diffuse;
-};
-
 layout(binding = 0) uniform CameraUBO {
     mat4 view;
     mat4 proj;
@@ -19,11 +14,6 @@ layout( push_constant ) uniform ModelMatrixPushConst {
 	mat4 modelMatrix;
     mat4 normalMatrix;
 } Matrix;
-
-layout(binding = 1) uniform GlobalLightingUBO {
-	lightUBO lights[10];
-	int numLights;
-} glights;
 
 layout (location = 0) out vec3 vertNormal;
 layout (location = 1) out vec3 eyeDir; 

@@ -157,6 +157,7 @@ private:
     const size_t MAX_FRAMES_IN_FLIGHT = 2;
     const static int textureCount{ 2 };
     static const int mariosToPaint = 1;
+    float fframe = 0;
 
     SDL_Event sdlEvent;
     uint32_t windowWidth;

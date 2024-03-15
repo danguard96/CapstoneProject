@@ -547,7 +547,7 @@ void VulkanRenderer::createDescriptorSetLayout(VkDescriptorSetLayout& descriptor
     glightingBinding.descriptorCount = 1;
     glightingBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     glightingBinding.pImmutableSamplers = nullptr;
-    glightingBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+    glightingBinding.stageFlags =  VK_SHADER_STAGE_FRAGMENT_BIT;
 
     VkDescriptorSetLayoutBinding sampler2DBinding{};
     sampler2DBinding.binding = 2;
@@ -1303,6 +1303,8 @@ void VulkanRenderer::recordCommandBuffer() {
 
         vkCmdEndRenderPass(commandBuffers[i]);
 
+        fframe = (fframe + 0.02f);
+
         if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
             throw std::runtime_error("failed to record command buffer!");
         }
@@ -1369,6 +1371,13 @@ void VulkanRenderer::SetGLightsUBO(const GlobalLighting& glights_) {
         glightsUBO.lights[i] = glights_.lights[i];
     }
     glightsUBO.numLights = glights_.numLights;
+    if(fframe> 429496){
+        glightsUBO.frame = 0;
+        fframe = 0;
+    }
+    else
+        glightsUBO.frame = fframe;
+    glightsUBO.distort = glights_.distort;
 }
 
 void VulkanRenderer::SetNormalUBO(const NormalUBO& normal_) {

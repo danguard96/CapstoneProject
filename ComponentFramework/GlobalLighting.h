@@ -10,6 +10,8 @@ struct LightUBO {
 struct GlobalLighting {
     LightUBO lights[10];
     int numLights = 0;
+    float frame = 0;
+    bool distort = false;
 };
 
 #endif

@@ -35,6 +35,7 @@ private:
 	bool zoom = false;
 	float fovy = 45.0f;
 	float aspectRatio;
+	bool distort;
 	bool front = false;
 	bool back = false;
 	bool right = false;

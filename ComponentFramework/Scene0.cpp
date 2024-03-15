@@ -106,6 +106,9 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 		case SDL_SCANCODE_Z:
 			zoom = true;
 			break;
+		case SDL_SCANCODE_G:
+			distort = true;
+			break;
 		}
 		break;
 	case SDL_KEYUP:
@@ -140,6 +143,9 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 		case SDL_SCANCODE_Z:
 			zoom = false;
 			break;
+		case SDL_SCANCODE_G:
+			distort = false;
+			break;
 		}
 	case SDL_WINDOWEVENT:
 		switch (sdlEvent.window.event) {
@@ -153,8 +159,6 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 		break;
 	}
 }
-
-//.25 .05 .005
 
 void Scene0::Update(const float deltaTime) {
 		
@@ -198,7 +202,7 @@ void Scene0::Update(const float deltaTime) {
 
 void Scene0::Render() const {
 
-	GlobalLighting gl = GlobalLighting{ { LightUBO{ Vec4(0.0f, 0.0f, 10.0f, 1.0f), Vec4(0.03, 0.03, 0.03, 1) } }, 1 };
+	GlobalLighting gl = GlobalLighting{ { LightUBO{ Vec4(0.0f, 0.0f, 10.0f, 1.0f), Vec4(0.03, 0.03, 0.03, 1) } }, 1, 0, distort };
 	vRenderer->SetModelMatrixPush(&vRenderer->chair,  MMath::translate(vRenderer->chair.position)
 													* MMath::rotate(vRenderer->chair.thetaRadianRotation, 1, 0, 0) 
 													* MMath::rotate(vRenderer->chair.gammaRadianRotation, 0, 1, 0)  
@@ -234,10 +238,10 @@ void Scene0::Render() const {
 
 	if(light){
 		gl = GlobalLighting{ { LightUBO{ Vec4(0.0f, 0.0f, 10.0f, 1.0f), Vec4(0.03, 0.03, 0.03, 1) },
-							LightUBO{ Vec4(vRenderer->lamp.position, 1), Vec4(0.03, 0.03, 0.03, 1)} }, 2 };
+							   LightUBO{ Vec4(vRenderer->lamp.position, 1), Vec4(0.03, 0.03, 0.03, 1)} }, 2, 0, distort };
 	}
 	if(music){
-	//	engine->setListenerPosition(irrklang::vec3df(-cameraPosition.position.x, cameraPosition.position.y, -cameraPosition.position.z),
+	//engine->setListenerPosition(irrklang::vec3df(-cameraPosition.position.x, cameraPosition.position.y, -cameraPosition.position.z),
     //                              irrklang::vec3df(cameraPosition.theta,cameraPosition.gamma,0));
 	}
 

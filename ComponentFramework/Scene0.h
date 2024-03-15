@@ -32,6 +32,9 @@ private:
 	bool music = false;
 //	irrklang::ISound* sound;
 	bool doorOpen = false;
+	bool zoom = false;
+	float fovy = 45.0f;
+	float aspectRatio;
 	bool front = false;
 	bool back = false;
 	bool right = false;

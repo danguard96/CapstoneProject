@@ -23,14 +23,13 @@ Scene0::~Scene0() {
 
 bool Scene0::OnCreate() {
 	int width = 0, height = 0;
-	float aspectRatio;
 //	engine = irrklang::createIrrKlangDevice();
 	switch (renderer->getRendererType()){
 	case RendererType::VULKAN:
 		
 		SDL_GetWindowSize(dynamic_cast<VulkanRenderer*>(renderer)->GetWindow(), &width, &height);
 		aspectRatio = static_cast<float>(width) / static_cast<float>(height);
-		camera->Perspective(45.0f, aspectRatio, 0.5f, 20.0f);
+		camera->Perspective(fovy, aspectRatio, 0.5f, 40.0f);
 		camera->LookAt(Vec3(0.0f, 0.0f, 5.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
 		SphereModelMatrix = MMath::translate(Vec3{ 2,0,0 }) * MMath::scale(Vec3{0.5f,0.5f,0.5f});
 		break;
@@ -48,8 +47,8 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 		switch (sdlEvent.window.event) {
 		case SDL_WINDOWEVENT_SIZE_CHANGED:
 			printf("size changed %d %d\n", sdlEvent.window.data1, sdlEvent.window.data2);
-			float aspectRatio = static_cast<float>(sdlEvent.window.data1) / static_cast<float>(sdlEvent.window.data2);
-			camera->Perspective(45.0f, aspectRatio, 0.5f, 20.0f);
+			aspectRatio = static_cast<float>(sdlEvent.window.data1) / static_cast<float>(sdlEvent.window.data2);
+			camera->Perspective(fovy, aspectRatio, 0.5f, 40.0f);
 			break;
 		}
 	}
@@ -104,8 +103,8 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 		case SDL_SCANCODE_F:
 			doorOpen = true;
 			break; 
-		case SDL_SCANCODE_3:
-			skin = 2;
+		case SDL_SCANCODE_Z:
+			zoom = true;
 			break;
 		}
 		break;
@@ -137,14 +136,17 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 			break;
 		case SDL_SCANCODE_F:
 			doorOpen = false;
-			break; 
+			break;
+		case SDL_SCANCODE_Z:
+			zoom = false;
+			break;
 		}
 	case SDL_WINDOWEVENT:
 		switch (sdlEvent.window.event) {
 		case SDL_WINDOWEVENT_SIZE_CHANGED:
 			printf("size changed %d %d\n", sdlEvent.window.data1, sdlEvent.window.data2);
-			float aspectRatio = static_cast<float>(sdlEvent.window.data1) / static_cast<float>(sdlEvent.window.data2);
-			camera->Perspective(45.0f, aspectRatio, 0.5f, 20.0f);
+			aspectRatio = static_cast<float>(sdlEvent.window.data1) / static_cast<float>(sdlEvent.window.data2);
+			camera->Perspective(fovy, aspectRatio, 0.5f, 40.0f);
 			break;
 
 		}
@@ -181,6 +183,14 @@ void Scene0::Update(const float deltaTime) {
 	if (!doorOpen && (vRenderer->door.position.z) > 0) {
 		vRenderer->door.position -= Vec3(0.005f, 0, 0.005f);
 		vRenderer->door.gammaRadianRotation -= 1.8f;
+	}
+	if (zoom && fovy > 25) {
+		fovy-= 0.9;
+		camera->Perspective(fovy, aspectRatio, 0.5f, 40.0f);
+	}
+	if (!zoom && fovy < 45.0f) {
+		fovy+= 0.8;
+		camera->Perspective(fovy, aspectRatio, 0.5f, 40.0f);
 	}
 
 	cameraPosition.gamma += lookLeft ? -2 : 0 + lookRight ? 2 : 0;

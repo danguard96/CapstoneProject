@@ -3,6 +3,8 @@
 #include "Scene.h"
 #include "Renderer.h"
 #include "Camera.h"
+#include "VulkanRenderer.h"
+//#include <irrKlang.h>
 using namespace MATH;
 
 /// Forward declarations 
@@ -25,6 +27,11 @@ private:
 	Matrix4 SphereModelMatrix;
 	Matrix4 SphereRotationMatrix;
 	int skin = 0;
+	bool light = false;
+	bool sit = false;
+	bool music = false;
+//	irrklang::ISound* sound;
+	bool doorOpen = false;
 	bool front = false;
 	bool back = false;
 	bool right = false;
@@ -33,6 +40,8 @@ private:
 	bool lookDown = false;
 	bool lookRight = false;
 	bool lookLeft = false;
+//	irrklang::ISoundEngine* engine;
+	VulkanRenderer* vRenderer;
 public:
 	explicit Scene0(Renderer* renderer_);
 	virtual ~Scene0();

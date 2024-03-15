@@ -22,6 +22,7 @@
 #include "VMath.h"
 #include "MMath.h"
 #include "Hash.h"
+#include "Actor.h"
 #include "GlobalLighting.h"
 using namespace MATH;
 
@@ -40,7 +41,7 @@ const std::vector<const char*> deviceExtensions = {
 #ifdef NDEBUG /// only use validation layers if in debug mode
 const bool enableValidationLayers = false;
 #else
-const bool enableValidationLayers = true;
+const bool enableValidationLayers = false;
 #endif
 
 struct QueueFamilyIndices {
@@ -70,16 +71,6 @@ struct NormalUBO {
     float plength;
     Vec4 colour;
 };
-
-/// Global Lighting for the UBO is in a separate header file
-/// GlobalLighting.h
-
-/// NEW
-struct ModelMatrixPushConst {
-    Matrix4 modelMatrix;
-    Matrix4 normalMatrix;
-};
-
 
 struct Vertex {
     Vec3 pos;
@@ -134,21 +125,6 @@ namespace std {
     };
 }
 
-struct BufferMemory {
-    VkBuffer bufferID;
-    VkDeviceMemory bufferMemoryID;
-};
-
-struct IndexedBufferMemory {
-    VkBuffer vertBufferID;
-    VkDeviceMemory vertBufferMemoryID;
-    VkDeviceSize vertBufferSize;
-
-    VkBuffer indexBufferID;
-    VkDeviceMemory indexBufferMemoryID;
-    VkDeviceSize indexBufferSize;
-};
-
 class VulkanRenderer : public Renderer {
 public:
     /// C11 precautions 
@@ -167,11 +143,15 @@ public:
     void SetCameraUBO(const Matrix4& projection_, const Matrix4& view_);
     void SetGLightsUBO(const GlobalLighting& glightsUBO_);
     void SetNormalUBO(const NormalUBO& normalUBO_);
-    void SetSphereModelMatrixPush(const Matrix4& modelMatrix);
-    void SetModelMatrixPush(const Matrix4& modelMatrix);
+    void SetSphereModelMatrixPush(Actor* actor, const Matrix4& modelMatrix);
+    void SetModelMatrixPush(Actor* actor, const Matrix4& modelMatrix);
     void SetTextureIndex(int textureIndex);
+    void commitFrame();
     SDL_Window* GetWindow() { return window; }
-
+    Actor chair     = Actor{0,0, Vec3{-8,-0.8,0}, Vec3{1,.2f,1}, "./meshes/cube.obj", "./textures/chair.png"};
+    Actor lamp      = Actor{0,0, Vec3{0,0,0}, Vec3{.1f,.1f,.1f}, "./meshes/Sphere.obj", "./textures/door.png"};
+    Actor musicBox  = Actor{0,0, Vec3{8,0,0}, Vec3{.5f,.5f,.5f}, "./meshes/Cube.obj", "./textures/chair.png"};
+    Actor door      = Actor{0,0, Vec3{-16,0,0}, Vec3{0.5f,1,0.05f}, "./meshes/Cube.obj", "./textures/door.png"};
 
 private:
     const size_t MAX_FRAMES_IN_FLIGHT = 2;
@@ -189,18 +169,9 @@ private:
     VkDevice device;
     VkRenderPass renderPass;
     VkDescriptorSetLayout descriptorSetLayout;
-    VkDescriptorSetLayout descriptorSetLayoutSphere;
-    VkDescriptorSetLayout descriptorSetLayoutNormal;
+    
     VkPipelineLayout pipelineLayout;
-    VkPipelineLayout pipelineLayoutNormal;
     VkPipeline graphicsPipelineID;
-    VkPipeline graphicsPipelineIDNormal;
-    std::array<VkDescriptorPool, textureCount> descriptorPoolArray;
-    VkDescriptorPool descriptorPoolSphere;
-    VkDescriptorPool descriptorPoolGeom;
-    std::array<std::vector<VkDescriptorSet>, textureCount> descriptorSetsArray;
-    std::vector<VkDescriptorSet> descriptorSetsSphere;
-    std::vector<VkDescriptorSet> descriptorSetsNormal;
 
     int descriptorSetsArrayIndex = 0;
 
@@ -246,11 +217,6 @@ private:
     GlobalLighting glightsUBO;
     NormalUBO normalUBO{1, Vec4{255,255,255,1}};
 
-    ModelMatrixPushConst modelMatrixPushConst[mariosToPaint];
-    ModelMatrixPushConst spherePushConst;
-
-
-
     bool hasStencilComponent(VkFormat format);
     void initVulkan();
     void createInstance();
@@ -265,9 +231,7 @@ private:
     VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
     void createRenderPass();
     void createDescriptorSetLayout(VkDescriptorSetLayout& descriptorSetLayout);
-    void createDescriptorSetLayoutGeom(VkDescriptorSetLayout& descriptorSetLayout);
     void createGraphicsPipeline(const char* vFilename, const char* fFilename, VkPipeline& pipeline, VkPipelineLayout& pipelineLayout);
-    void createGraphicsPipelineGeom(const char* vFilename, const char* gFilename, const char* fFilename, VkPipeline& pipeline, VkPipelineLayout& pipelineLayout, VkDescriptorSetLayout& descriptorSetLayout);
     void createFramebuffers();
     void createCommandPool();
     void createDepthResources();
@@ -284,16 +248,16 @@ private:
     void createUniformBuffers(VkDeviceSize bufferSize, std::vector<VkBuffer>& uniformBuffer, std::vector<VkDeviceMemory>& uniformBufferMemory);
     void destroyUniformBuffer(std::vector<VkBuffer>& uniformBuffer, std::vector<VkDeviceMemory>& uniformBufferMemory);
     void createDescriptorPool(VkDescriptorPool& descriptorPool);
-    void createDescriptorPoolGeom(VkDescriptorPool& descriptorPool);
     void createDescriptorSets(VkDescriptorSetLayout& descriptorSetLayout, std::vector<VkDescriptorSet>& descriptorSets, VkDescriptorPool descriptorPool, VkImageView& textureImageView, VkSampler& textureSample);
-    void createDescriptorSetsGeom(VkDescriptorSetLayout& descriptorSetLayout, std::vector<VkDescriptorSet>& descriptorSets, VkDescriptorPool descriptorPool);
     void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
     void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
     void createCommandBuffers();
+    void actorLoad(Actor* actor);
 
     void recordCommandBuffer();
     void createSyncObjects();
     void cleanup();
+    void cleanupActor(Actor* actor);
     void cleanupSwapChain();
     void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
     void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
@@ -320,14 +284,7 @@ private:
     VkCommandBuffer beginSingleTimeCommands();
     void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 
-    std::array<VkImage, textureCount>textureImageArray;
-    VkImage textureImageSphere;
     VkDeviceMemory textureImageMemory;
-    std::array<VkImageView,textureCount> textureImageViewArray;
-    VkImageView textureImageViewSphere;
-    std::array<VkSampler, textureCount> textureSamplerArray;
-    VkSampler textureSamplerSphere;
-
 
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
     VkShaderModule createShaderModule(const std::vector<char>& code);

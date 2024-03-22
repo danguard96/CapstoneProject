@@ -12,6 +12,8 @@
 Scene0::Scene0(Renderer *renderer_): 
 	Scene(nullptr),renderer(renderer_), camera(nullptr) {
 	vRenderer = dynamic_cast<VulkanRenderer*>(renderer_);
+	sound = engine->play2D("./audio/menu.wav", true, true);
+	sound->setVolume(0.3);
 	camera = new Camera();
 	Debug::Info("Created Scene0: ", __FILE__, __LINE__);
 }
@@ -23,13 +25,12 @@ Scene0::~Scene0() {
 
 bool Scene0::OnCreate() {
 	int width = 0, height = 0;
-//	engine = irrklang::createIrrKlangDevice();
 	switch (renderer->getRendererType()){
 	case RendererType::VULKAN:
 		
 		SDL_GetWindowSize(dynamic_cast<VulkanRenderer*>(renderer)->GetWindow(), &width, &height);
 		aspectRatio = static_cast<float>(width) / static_cast<float>(height);
-		camera->Perspective(fovy, aspectRatio, 0.5f, 40.0f);
+		camera->Perspective(fovy, aspectRatio, 0.01f, 90.0f);
 		camera->LookAt(Vec3(0.0f, 0.0f, 5.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
 		SphereModelMatrix = MMath::translate(Vec3{ 2,0,0 }) * MMath::scale(Vec3{0.5f,0.5f,0.5f});
 		break;
@@ -37,7 +38,7 @@ bool Scene0::OnCreate() {
 	case RendererType::OPENGL:
 		break;
 	}
-	cameraPosition = CameraPosition{Vec3{0,0,-5},1,0};
+	cameraPosition = CameraPosition{Vec3{0,0,-5},1,0, 0.5f};
 
 	return true;
 }
@@ -80,24 +81,20 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 			lookRight = true;
 			break;
 		case SDL_SCANCODE_E:
-			if(MATH::VMath::distance(vRenderer->lamp.position, cameraPosition.position) < 3){
+			if(MATH::VMath::distance(Vec3{-vRenderer->actors[1].position.x, 0, -vRenderer->actors[1].position.z }, cameraPosition.position) < 1){
 				light = !light;
 			}
-			if(MATH::VMath::distance(Vec3{-vRenderer->chair.position.x, vRenderer->chair.position.y, -vRenderer->chair.position.z }, cameraPosition.position) < 3){
+			if(MATH::VMath::distance(Vec3{-vRenderer->actors[0].position.x, 0, -vRenderer->actors[0].position.z }, cameraPosition.position) < 1){
 				sit = !sit;
 			}
-			if(MATH::VMath::distance(Vec3{-vRenderer->musicBox.position.x, vRenderer->musicBox.position.y, -vRenderer->musicBox.position.z }, cameraPosition.position) < 3){
-				/*music = !music;
+			if(MATH::VMath::distance(Vec3{-vRenderer->actors[2].position.x, 0, -vRenderer->actors[2].position.z }, cameraPosition.position) < 1){
+				music = !music;
 				if(music){
-					sound = engine->play3D("./audio/song.mp3", irrklang::vec3df(vRenderer->musicBox.position.x,
-																				vRenderer->musicBox.position.y,
-																				vRenderer->musicBox.position.z), false, false, true);
-					sound->setMinDistance(5.0f);
+					sound->setIsPaused(false);
 				}
 				else{
-					sound->stop();
-					sound->drop();
-				}*/
+					sound->setIsPaused(true);
+				}
 			}
 			break;
 		case SDL_SCANCODE_F:
@@ -161,14 +158,22 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 }
 
 void Scene0::Update(const float deltaTime) {
-		
 	static float elapsedTime = 0.0f;
 	elapsedTime += deltaTime;
 	if(!sit){
 		float fb = (front ? 0.1 : 0 + back ? -0.1 : 0) * 0.01;
 		float lr = (right ? 0.1 : 0 + left ? -0.1 : 0) * 0.01;
-		cameraPosition.position += (Vec3(-sin(cameraPosition.gamma * deg2rad),0,cos(cameraPosition.gamma * deg2rad)) * rad2deg * fb)
+		Vec3 newPos = cameraPosition.position + (Vec3(-sin(cameraPosition.gamma * deg2rad),0,cos(cameraPosition.gamma * deg2rad)) * rad2deg * fb)
 			+ (Vec3(-sin((90 + cameraPosition.gamma) * deg2rad), 0, cos((90 + cameraPosition.gamma) * deg2rad)) * rad2deg * lr);
+		if(
+			MATH::VMath::distance(Vec3{-vRenderer->actors[0].position.x, 0, -vRenderer->actors[0].position.z }, newPos) > vRenderer->actors[0].colliderRadius + cameraPosition.colliderRadius && 
+			MATH::VMath::distance(Vec3{-vRenderer->actors[1].position.x, 0, -vRenderer->actors[1].position.z }, newPos) > vRenderer->actors[1].colliderRadius + cameraPosition.colliderRadius &&
+			MATH::VMath::distance(Vec3{-vRenderer->actors[2].position.x, 0, -vRenderer->actors[2].position.z }, newPos) > vRenderer->actors[2].colliderRadius + cameraPosition.colliderRadius &&
+			MATH::VMath::distance(Vec3{-vRenderer->actors[3].position.x, 0, -vRenderer->actors[3].position.z }, newPos) > vRenderer->actors[3].colliderRadius + cameraPosition.colliderRadius 
+		)
+		{
+			cameraPosition.position = newPos;
+		}
 	}
 
 	cameraPosition.theta += lookUp ? -2 : 0 + lookDown ? 2 : 0;
@@ -180,13 +185,13 @@ void Scene0::Update(const float deltaTime) {
 		cameraPosition.theta = 90;
 	}
 
-	if (doorOpen && (0.25f - vRenderer->door.position.z) > 0) {
-		vRenderer->door.position += Vec3(0.005f, 0, 0.005f);
-		vRenderer->door.gammaRadianRotation += 1.8f;
+	if (doorOpen && vRenderer->actors[3].gammaRadianRotation >= 0 && vRenderer->actors[3].gammaRadianRotation < 90) {
+		//vRenderer->actors[3].position += Vec3(0.005f, 0, 0.005f);
+		vRenderer->actors[3].gammaRadianRotation += 1.8f;
 	}
-	if (!doorOpen && (vRenderer->door.position.z) > 0) {
-		vRenderer->door.position -= Vec3(0.005f, 0, 0.005f);
-		vRenderer->door.gammaRadianRotation -= 1.8f;
+	if (!doorOpen && vRenderer->actors[3].gammaRadianRotation >= 1.8) {
+		//vRenderer->actors[3].position -= Vec3(0.005f, 0, 0.005f);
+		vRenderer->actors[3].gammaRadianRotation -= 1.8f;
 	}
 	if (zoom && fovy > 25) {
 		fovy-= 0.9;
@@ -200,28 +205,26 @@ void Scene0::Update(const float deltaTime) {
 	cameraPosition.gamma += lookLeft ? -2 : 0 + lookRight ? 2 : 0;
 }
 
+void Scene0::setMatrix(Actor* a) const{
+	vRenderer->SetModelMatrixPush(a,  MMath::translate(a->position)
+													* MMath::rotate(a->thetaRadianRotation, 1, 0, 0) 
+													* MMath::rotate(a->gammaRadianRotation, 0, 1, 0)  
+													* MMath::scale(a->scale));
+}
+
 void Scene0::Render() const {
 
 	GlobalLighting gl = GlobalLighting{ { LightUBO{ Vec4(0.0f, 0.0f, 10.0f, 1.0f), Vec4(0.03, 0.03, 0.03, 1) } }, 1, 0, distort };
-	vRenderer->SetModelMatrixPush(&vRenderer->chair,  MMath::translate(vRenderer->chair.position)
-													* MMath::rotate(vRenderer->chair.thetaRadianRotation, 1, 0, 0) 
-													* MMath::rotate(vRenderer->chair.gammaRadianRotation, 0, 1, 0)  
-													* MMath::scale(vRenderer->chair.scale));
 
-	vRenderer->SetModelMatrixPush(&vRenderer->lamp,  MMath::translate(vRenderer->lamp.position)
-													* MMath::rotate(vRenderer->lamp.thetaRadianRotation, 1, 0, 0) 
-													* MMath::rotate(vRenderer->lamp.gammaRadianRotation, 0, 1, 0)  
-													* MMath::scale(vRenderer->lamp.scale));
-
-	vRenderer->SetModelMatrixPush(&vRenderer->musicBox,   MMath::translate(vRenderer->musicBox.position)
-														* MMath::rotate(vRenderer->musicBox.thetaRadianRotation, 1, 0, 0) 
-														* MMath::rotate(vRenderer->musicBox.gammaRadianRotation, 0, 1, 0)  
-														* MMath::scale(vRenderer->musicBox.scale));
-
-	vRenderer->SetModelMatrixPush(&vRenderer->door,   MMath::translate(vRenderer->door.position)
-													* MMath::rotate(vRenderer->door.thetaRadianRotation, 1, 0, 0) 
-													* MMath::rotate(vRenderer->door.gammaRadianRotation, 0, 1, 0)
-													* MMath::scale(vRenderer->door.scale));
+	setMatrix(&vRenderer->actors[0]);
+	
+	setMatrix(&vRenderer->actors[1]);
+	
+	setMatrix(&vRenderer->actors[2]);
+	
+	setMatrix(&vRenderer->actors[3]);
+	
+	setMatrix(&vRenderer->actors[4]);
 
 	if(!sit) {
 		vRenderer->SetCameraUBO(camera->GetProjectionMatrix(),    MMath::rotate(cameraPosition.theta,Vec3(1,0,0)) 
@@ -231,18 +234,14 @@ void Scene0::Render() const {
 	else {
 		vRenderer->SetCameraUBO(camera->GetProjectionMatrix(),    MMath::rotate(cameraPosition.theta,Vec3(1,0,0)) 
 																* MMath::rotate(cameraPosition.gamma, 0, 1, 0) 
-																* MMath::translate(Vec3{-vRenderer->chair.position.x, vRenderer->chair.position.y, -vRenderer->chair.position.z } - Vec3(0,0.6f,0)));
+																* MMath::translate(Vec3{-vRenderer->actors[0].position.x, 0, -vRenderer->actors[0].position.z }));
 	}
 
 	vRenderer->commitFrame();
 
 	if(light){
 		gl = GlobalLighting{ { LightUBO{ Vec4(0.0f, 0.0f, 10.0f, 1.0f), Vec4(0.03, 0.03, 0.03, 1) },
-							   LightUBO{ Vec4(vRenderer->lamp.position, 1), Vec4(0.03, 0.03, 0.03, 1)} }, 2, 0, distort };
-	}
-	if(music){
-	//engine->setListenerPosition(irrklang::vec3df(-cameraPosition.position.x, cameraPosition.position.y, -cameraPosition.position.z),
-    //                              irrklang::vec3df(cameraPosition.theta,cameraPosition.gamma,0));
+							   LightUBO{ Vec4(vRenderer->actors[1].position, 1), Vec4(0.03, 0.03, 0.03, 1)} }, 2, 0, distort };
 	}
 
 	vRenderer->SetGLightsUBO(gl);

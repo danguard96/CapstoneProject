@@ -4,7 +4,7 @@
 #include "Renderer.h"
 #include "Camera.h"
 #include "VulkanRenderer.h"
-//#include <irrKlang.h>
+#include <irrKlang.h>
 using namespace MATH;
 
 /// Forward declarations 
@@ -14,6 +14,7 @@ struct CameraPosition {
 	Vec3 position;
 	float theta;
 	float gamma;
+	float colliderRadius;
 };
 
 class Scene0 : public Scene {
@@ -30,7 +31,6 @@ private:
 	bool light = false;
 	bool sit = false;
 	bool music = false;
-//	irrklang::ISound* sound;
 	bool doorOpen = false;
 	bool zoom = false;
 	float fovy = 45.0f;
@@ -44,8 +44,8 @@ private:
 	bool lookDown = false;
 	bool lookRight = false;
 	bool lookLeft = false;
-//	irrklang::ISoundEngine* engine;
 	VulkanRenderer* vRenderer;
+	void setMatrix(Actor* a) const;
 public:
 	explicit Scene0(Renderer* renderer_);
 	virtual ~Scene0();
@@ -55,6 +55,8 @@ public:
 	virtual void Update(const float deltaTime) override;
 	virtual void Render() const override;
 	virtual void HandleEvents(const SDL_Event &sdlEvent) override;
+	irrklang::ISoundEngine* engine = irrklang::createIrrKlangDevice();;
+	irrklang::ISound* sound;
 };
 
 

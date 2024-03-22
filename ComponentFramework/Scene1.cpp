@@ -68,10 +68,6 @@ void Scene1::Render() const {
 	case RendererType::VULKAN:
 		VulkanRenderer* vRenderer;
 		vRenderer = dynamic_cast<VulkanRenderer*>(renderer);
-		vRenderer->SetModelMatrixPush(&vRenderer->chair,  MMath::rotate(vRenderer->chair.thetaRadianRotation, 1, 0, 0) 
-														* MMath::rotate(vRenderer->chair.gammaRadianRotation, 0, 1, 0)  
-														* MMath::scale(vRenderer->chair.scale) 
-														* MMath::translate(vRenderer->chair.position));
 		vRenderer->SetCameraUBO(camera->GetProjectionMatrix(), camera->GetViewMatrix());
 		vRenderer->SetGLightsUBO(gl);
 		vRenderer->Render();

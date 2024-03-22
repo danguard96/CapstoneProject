@@ -15,7 +15,7 @@ namespace  MATH {
 /// small in "float" percision. 
 
 	#ifndef VERY_SMALL
-	#define VERY_SMALL 1.0e-7f
+	#define VERY_SMALL 1.0e-10f
 	#endif
 
 	#ifndef VERY_CLOSE_TO_ONE 

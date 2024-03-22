@@ -28,9 +28,10 @@ public:
     MATH::Vec3 scale;
     std::string model;
     std::string texture;
-    Actor(float nThetaRadianRotation, float nGammaRadianRotation, MATH::Vec3 nPosition, MATH::Vec3 nScale, std::string nModel, std::string nTexture):
+    float colliderRadius;
+    Actor(float nThetaRadianRotation, float nGammaRadianRotation, MATH::Vec3 nPosition, MATH::Vec3 nScale, std::string nModel, std::string nTexture, float nColliderRadius):
     thetaRadianRotation(nThetaRadianRotation), gammaRadianRotation(nGammaRadianRotation), position(nPosition), scale(nScale), model(nModel), 
-        texture(nTexture){}
+        texture(nTexture), colliderRadius(nColliderRadius) {}
     VkImage textureImage;
     VkImageView textureImageView;
     VkSampler imageSampler;

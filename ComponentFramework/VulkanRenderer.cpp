@@ -145,10 +145,10 @@ void VulkanRenderer::initVulkan() {
     createUniformBuffers(sizeof(CameraUBO), cameraBuffers, cameraBuffersMemory);
     createUniformBuffers(sizeof(GlobalLighting), glightingBuffers, glightingBuffersMemory);
 
-    actorLoad(&chair);
-    actorLoad(&lamp);
-    actorLoad(&musicBox);
-    actorLoad(&door);
+    for(int actorI = 0; actorI < 5; actorI++)
+    {
+        actorLoad(&actors[actorI]);
+    }
     
     createCommandBuffers();
     recordCommandBuffer();
@@ -188,10 +188,10 @@ void VulkanRenderer::cleanupSwapChain() {
     destroyUniformBuffer(cameraBuffers, cameraBuffersMemory);
     destroyUniformBuffer(glightingBuffers, glightingBuffersMemory);
     destroyUniformBuffer(normalsBuffers, normalsBuffersMemory);
-    vkDestroyDescriptorPool(device, chair.descriptorPool, nullptr);
-    vkDestroyDescriptorPool(device, lamp.descriptorPool, nullptr);
-    vkDestroyDescriptorPool(device, musicBox.descriptorPool, nullptr);
-    vkDestroyDescriptorPool(device, door.descriptorPool, nullptr);
+
+    for(int actorI = 0; actorI < 5; actorI++) {
+        vkDestroyDescriptorPool(device, actors[actorI].descriptorPool, nullptr);
+    }
 }
 
 void VulkanRenderer::destroyUniformBuffer(std::vector<VkBuffer>& uniformBuffer, std::vector<VkDeviceMemory>& uniformBufferMemory) {
@@ -216,10 +216,10 @@ void VulkanRenderer::cleanupActor(Actor* actor){
 void VulkanRenderer::cleanup() {
     cleanupSwapChain();
 
-    cleanupActor(&chair);
-    cleanupActor(&lamp);
-    cleanupActor(&musicBox);
-    cleanupActor(&door);
+    for(int actorI = 0; actorI < 5; actorI++)
+    {
+        cleanupActor(&actors[actorI]);
+    }
 
     vkFreeMemory(device, textureImageMemory, nullptr);
 
@@ -1251,7 +1251,7 @@ void VulkanRenderer::recordCommandBuffer() {
         }
 
         std::array<VkClearValue, 2> clearValues{};
-        clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+        clearValues[0].color = { .53f, .81f, .92f, 1.0f };
         clearValues[1].depthStencil = { 1.0f, 0 };
 
         VkRenderPassBeginInfo renderPassInfo{};
@@ -1269,37 +1269,16 @@ void VulkanRenderer::recordCommandBuffer() {
         
         vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipelineID);
 
-        VkBuffer vertexBuffersChair[] = { chair.modelBufferedMemory.vertBufferID };
-        VkDeviceSize offsetsChair[] = { 0 };
-        vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffersChair, offsetsChair);
-        vkCmdBindIndexBuffer(commandBuffers[i], chair.modelBufferedMemory.indexBufferID, 0, VK_INDEX_TYPE_UINT32);
-        vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(ModelMatrixPushConst), &chair.modelMatrixPushConst);
-        vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &chair.descriptorSets[i], 0, nullptr);
-        vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(chair.modelBufferedMemory.indexBufferSize)/3, 1, 0, 0, 0);
-
-        VkBuffer vertexBuffersLamp[] = { lamp.modelBufferedMemory.vertBufferID };
-        VkDeviceSize offsetsLamp[] = { 0 };
-        vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffersLamp, offsetsLamp);
-        vkCmdBindIndexBuffer(commandBuffers[i], lamp.modelBufferedMemory.indexBufferID, 0, VK_INDEX_TYPE_UINT32);
-        vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(ModelMatrixPushConst), &lamp.modelMatrixPushConst);
-        vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &lamp.descriptorSets[i], 0, nullptr);
-        vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(lamp.modelBufferedMemory.indexBufferSize)/3, 1, 0, 0, 0);
-
-        VkBuffer vertexBuffersMusicBox[] = { musicBox.modelBufferedMemory.vertBufferID };
-        VkDeviceSize offsetsMusicBox[] = { 0 };
-        vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffersMusicBox, offsetsMusicBox);
-        vkCmdBindIndexBuffer(commandBuffers[i], musicBox.modelBufferedMemory.indexBufferID, 0, VK_INDEX_TYPE_UINT32);
-        vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(ModelMatrixPushConst), &musicBox.modelMatrixPushConst);
-        vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &musicBox.descriptorSets[i], 0, nullptr);
-        vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(musicBox.modelBufferedMemory.indexBufferSize)/3, 1, 0, 0, 0);
-
-        VkBuffer vertexBuffersDoor[] = { door.modelBufferedMemory.vertBufferID };
-        VkDeviceSize offsetsDoor[] = { 0 };
-        vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffersDoor, offsetsDoor);
-        vkCmdBindIndexBuffer(commandBuffers[i], door.modelBufferedMemory.indexBufferID, 0, VK_INDEX_TYPE_UINT32);
-        vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(ModelMatrixPushConst), &door.modelMatrixPushConst);
-        vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &door.descriptorSets[i], 0, nullptr);
-        vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(door.modelBufferedMemory.indexBufferSize)/3, 1, 0, 0, 0);
+        for(int actorI = 0; actorI < 5; actorI++)
+        {
+            VkBuffer vertexBuffersChair[] = { actors[actorI].modelBufferedMemory.vertBufferID };
+            VkDeviceSize offsetsChair[] = { 0 };
+            vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffersChair, offsetsChair);
+            vkCmdBindIndexBuffer(commandBuffers[i], actors[actorI].modelBufferedMemory.indexBufferID, 0, VK_INDEX_TYPE_UINT32);
+            vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(ModelMatrixPushConst), &actors[actorI].modelMatrixPushConst);
+            vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &actors[actorI].descriptorSets[i], 0, nullptr);
+            vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(actors[actorI].modelBufferedMemory.indexBufferSize)/3, 1, 0, 0, 0);
+        }
 
         vkCmdEndRenderPass(commandBuffers[i]);
 

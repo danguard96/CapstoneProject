@@ -39,7 +39,7 @@ const std::vector<const char*> deviceExtensions = {
 };
 
 #ifdef NDEBUG /// only use validation layers if in debug mode
-const bool enableValidationLayers = false;
+const bool enableValidationLayers = true;
 #else
 const bool enableValidationLayers = false;
 #endif
@@ -148,10 +148,13 @@ public:
     void SetTextureIndex(int textureIndex);
     void commitFrame();
     SDL_Window* GetWindow() { return window; }
-    Actor chair     = Actor{0,0, Vec3{-8,-0.8,0}, Vec3{1,.2f,1}, "./meshes/cube.obj", "./textures/chair.png"};
-    Actor lamp      = Actor{0,0, Vec3{0,0,0}, Vec3{.1f,.1f,.1f}, "./meshes/Sphere.obj", "./textures/door.png"};
-    Actor musicBox  = Actor{0,0, Vec3{8,0,0}, Vec3{.5f,.5f,.5f}, "./meshes/Cube.obj", "./textures/chair.png"};
-    Actor door      = Actor{0,0, Vec3{-16,0,0}, Vec3{0.5f,1,0.05f}, "./meshes/Cube.obj", "./textures/door.png"};
+    std::array<Actor, 5> actors = {
+        Actor{0,0, Vec3{-2,-1.25,0}, Vec3{.03f,.03f,.03f}, "./meshes/Chair.obj", "./textures/chair.png", 0.2f},
+        Actor{0,0, Vec3{0,-1,0}, Vec3{.015f,.015f,.015f}, "./meshes/Lamp.obj", "./textures/chair.png", 0.2f},
+        Actor{0,0, Vec3{2,-0.5,0}, Vec3{.0025f,.0025f,.0025f}, "./meshes/Radio.obj", "./textures/chair.png", 0.2f},
+        Actor{0,0, Vec3{-4,-1.25,0}, Vec3{.009f,.009f,.009f}, "./meshes/Door.obj", "./textures/door.png", 0.1f},
+        Actor{0,0, Vec3{0,-1.25,0}, Vec3{100.0f,0.001f,100.0f}, "./meshes/cube.obj", "./textures/door.png", 0.0f}
+    };
 
 private:
     const size_t MAX_FRAMES_IN_FLIGHT = 2;

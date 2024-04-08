@@ -12,9 +12,6 @@ public:
 	bool Initialize(std::string name_, int width_, int height_);
 	void GetEvents();
 	
-	
-private:
-	
 	enum SCENE_NUMBER {
 		SCENE0 = 0,
 		SCENE1 = 1,
@@ -24,6 +21,12 @@ private:
 		SCENE5,
 		SCENE6
 	};
+
+	void ChangeScene(SCENE_NUMBER scene);
+	
+private:
+	
+
 
 	enum class RendererType rendererType;
 	class Scene* currentScene;

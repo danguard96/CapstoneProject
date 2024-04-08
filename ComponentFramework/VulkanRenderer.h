@@ -64,7 +64,7 @@ struct SwapChainSupportDetails {
 struct CameraUBO {
     Matrix4 view;
     Matrix4 proj;
-    Vec4  lightPos;
+    Vec3 viewPos;
 };
 
 struct NormalUBO {
@@ -140,7 +140,7 @@ public:
     bool OnCreate();
     void OnDestroy();
     void Render();
-    void SetCameraUBO(const Matrix4& projection_, const Matrix4& view_);
+    void SetCameraUBO(const Matrix4& projection_, const Matrix4& view_, const Vec3& viewPosi);
     void SetGLightsUBO(const GlobalLighting& glightsUBO_);
     void SetNormalUBO(const NormalUBO& normalUBO_);
     void SetSphereModelMatrixPush(Actor* actor, const Matrix4& modelMatrix);
@@ -148,14 +148,168 @@ public:
     void SetTextureIndex(int textureIndex);
     void commitFrame();
     SDL_Window* GetWindow() { return window; }
-    std::array<Actor, 5> actors = {
-        Actor{0,0, Vec3{-2,-1.25,0}, Vec3{.03f,.03f,.03f}, "./meshes/Chair.obj", "./textures/chair.png", 0.2f},
-        Actor{0,0, Vec3{0,-1,0}, Vec3{.015f,.015f,.015f}, "./meshes/Lamp.obj", "./textures/chair.png", 0.2f},
-        Actor{0,0, Vec3{2,-0.5,0}, Vec3{.0025f,.0025f,.0025f}, "./meshes/Radio.obj", "./textures/chair.png", 0.2f},
-        Actor{0,0, Vec3{-4,-1.25,0}, Vec3{.009f,.009f,.009f}, "./meshes/Door.obj", "./textures/door.png", 0.1f},
-        Actor{0,0, Vec3{0,-1.25,0}, Vec3{100.0f,0.001f,100.0f}, "./meshes/cube.obj", "./textures/door.png", 0.0f}
+
+    int scene = 0;
+
+    void setScene(int scn){
+        scene = scn;
+    }
+    //Asset Positions - Inside
+
+    Vec3 chairPos = Vec3(-2, 0, 0);
+    Vec3 lampPos = Vec3(0, 0.75f, 0);
+    Vec3 radioPos = Vec3(2, 0.75, 0);
+    Vec3 doorPos = Vec3(-4, 0, 0);
+    Vec3 mainDoorPos = Vec3(0, 0, 14.9);
+    Vec3 roombaPos = Vec3(2, 0.75, 4);
+    Vec3 floorPos = Vec3(0, 0, 0);
+    Vec3 wallEastPos = Vec3(15, 1.25f, 0);
+    Vec3 wallWestPos = Vec3(-15, 1.25f, 0);
+    Vec3 wallNorthPos = Vec3(0, 1.25f, 15);
+    Vec3 wallSouthPos = Vec3(0, 1.25f, -15);
+    Vec3 ceilingPos = Vec3(0, 4.25f, 0);
+    
+    //Colliders - Inside
+
+    Vec3 chairCol = Vec3(0.2f, 1.0f, 0.2f);
+    float lampCol = 0.4f;
+    Vec3 radioCol = Vec3(0.25f, 0.25f, 0.25f);
+    Vec3 doorCol = Vec3(0.75f, 1.0f, 0.25f);
+    Vec3 doorOffset = Vec3(0.5f, 0, 0);
+    float roombaCol = 0.4f;
+    Vec3 floorCol = Vec3(100.0f, 0.001f, 100.0f);
+    Vec3 wallEastCol = Vec3(0.001f, 3.0f, 15.0f);
+    Vec3 wallWestCol = Vec3(0.001f, 3.0f, 15.0f);
+    Vec3 wallNorthCol = Vec3(15.0f, 3.0f, 0.001f);
+    Vec3 wallSouthCol = Vec3(15.0f, 3.0f, 0.001f);
+    //Vec3 ceilingCol = Vec3();
+
+    //----------------------------------------------------------------
+    
+    //Asset Positions - Outside
+
+    Vec3 housePos = Vec3(0, -0.5f, 0);
+    Vec3 houseDoorPos = Vec3(0.9f, -0.1f, 1.25f);
+    Vec3 outerChair1Pos = Vec3(-5.95f, -9.75f, 0.25f);
+    Vec3 outerChair2Pos = Vec3(-4.35f, -9.75f, 1.3f);
+    Vec3 outerWindowPos = Vec3(-2.625, -9.0f, -2.0f);
+    Vec3 tree1_1Pos = Vec3(-5.45f, -8.8f, -2.375f);
+    Vec3 tree1_2Pos = Vec3(-5.7f, -8.8f, -2.5625f);
+    Vec3 tree1_3Pos = Vec3(-5.95f, -8.8f, -2.75f);
+    Vec3 tree2_1Pos = Vec3(4.55f, -8.8f, -2.3f);
+    Vec3 tree2_2Pos = Vec3(4.51875f, -8.8f, -2.45625f);
+    Vec3 tree2_3Pos = Vec3(4.4875f, -8.8f, -2.6125f);
+    Vec3 tree2_4Pos = Vec3(4.45625f, -8.8f, -2.76875f);
+    Vec3 tree2_5Pos = Vec3(4.425f, -8.8f, -2.925f);
+    Vec3 tree2_6Pos = Vec3(4.39375f, -8.8f, -3.08125f);
+    Vec3 tree2_7Pos = Vec3(4.3625f, -8.8f, -3.2375f);
+    Vec3 tree2_8Pos = Vec3(4.33125f, -8.8f, -3.39375f);
+    Vec3 tree2_9Pos = Vec3(4.3f, -8.8f, -3.55f);
+    Vec3 tree3_1Pos = Vec3(4.25f, -8.8f, 0.25f);
+    Vec3 tree3_2Pos = Vec3(4.5f, -8.8f, 0.25f);
+    Vec3 tree3_3Pos = Vec3(4.75f, -8.8f, 0.25f);
+    Vec3 doorPost1Pos = Vec3(2.6f, -8.8f, 2.25f);
+    Vec3 doorPost2Pos = Vec3(0.255f, -8.8f, 2.25f);
+
+    //Colliders - Outside
+    
+    Vec3 invisibleOffset = Vec3(0, 10, 0);
+    Vec3 houseCol = Vec3(1.25f, 1.5f, 1.25f);
+    Vec3 houseDoorCol = Vec3(0.75f, 2.0f, 0.25f);
+    Vec3 houseDoorOffset = Vec3(0.5f, 0, 0);
+    Vec3 outerChair1Col = Vec3(0.5f, 2.0f, 1.0f);
+    Vec3 outerChair2Col = Vec3(0.5f, 2.0f, 1.0f);
+    Vec3 outerWindowCol = Vec3(1.0f, 1.0f, 0.5f);
+    float tubeCol = 0.2f;
+
+    std::array<Actor, 12> actors = {
+        //Chair - 0
+        Actor{0,0, chairPos, Vec3{.025f,.025f,.025f}, "./meshes/Chair.obj", "./textures/chair.png", new Collider(chairPos + chairCol,chairPos - chairCol)},
+
+        //Lamp - 1
+        Actor{0,0, lampPos, Vec3{.01f,.01f,.01f}, "./meshes/Lamp.obj", "./textures/chair.png", new Collider(lampPos, lampCol)},
+
+        //Radio - 2
+        Actor{0,0, radioPos, Vec3{.0025f,.0025f,.0025f}, "./meshes/Radio.obj", "./textures/chair.png", new Collider(radioPos + radioCol,radioPos - radioCol)},
+
+        //Door - 3
+        Actor{0,0, doorPos, Vec3{.009f,.009f,.009f}, "./meshes/Door.obj", "./textures/door.png", new Collider(doorPos + doorCol + doorOffset,doorPos - doorCol + doorOffset)},
+
+        //MainDoor - 4
+        Actor{0,0, mainDoorPos, Vec3{.009f,.009f,.009f}, "./meshes/Door.obj", "./textures/door.png", new Collider(mainDoorPos + doorCol + doorOffset,mainDoorPos - doorCol + doorOffset)},
+
+        //Roomba - 4
+        Actor{0,0, roombaPos, Vec3{.025f,.025f,.025f}, "./meshes/Roomba.obj", "./textures/door.png", new Collider(roombaPos, roombaCol)},
+
+        //Floor
+        Actor{0,0, floorPos, Vec3{100.0f,0.001f,100.0f}, "./meshes/cube.obj", "./textures/door.png", new Collider(floorPos + floorCol,floorPos - floorCol)},
+
+        //Wall 1
+        Actor{0,0, wallEastPos, Vec3{0.001f,3.0f,15.0f}, "./meshes/cube.obj", "./textures/door.png", new Collider(wallEastPos + wallEastCol,wallEastPos - wallEastCol)},
+
+        //Wall 2
+        Actor{0,0, wallWestPos, Vec3{0.001f,3.0f,15.0f}, "./meshes/cube.obj", "./textures/door.png", new Collider(wallWestPos + wallWestCol,wallWestPos - wallWestCol)},
+
+        //Wall 3
+        Actor{0,0, wallNorthPos, Vec3{15.0f,3.0f,0.001f}, "./meshes/cube.obj", "./textures/door.png", new Collider(wallNorthPos + wallNorthCol,wallNorthPos - wallNorthCol)},
+
+        //Wall 4
+        Actor{0,0, wallSouthPos, Vec3{15.0f,3.0f,0.001f}, "./meshes/cube.obj", "./textures/door.png", new Collider(wallSouthPos + wallSouthCol,wallSouthPos - wallSouthCol)},
+
+        //Ceiling
+        Actor{0,0, ceilingPos, Vec3{15.0f,0.001f,15.0f}, "./meshes/cube.obj", "./textures/door.png"},
+
+        //ColliderBox
+        //Actor{0,0, Vec3{-2,0,0}, Vec3{.4f,1.2f,.4f}, "./meshes/cube.obj", "./textures/door.png"}
+        // -2.4, -2.45, -0.4       -1.6, -0.05, 0.4
     };
 
+    std::array<Actor, 22> actors2 = {
+
+        //House - 0
+        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/House.obj", "./textures/door.png", new Collider(Vec3(3.3f, 4.3f, 1.3f), Vec3(-3.3f, -2.3f, -5.3f))},
+
+        //House Door - 1
+        Actor{0,0, houseDoorPos, Vec3{.009f,.009f,.009f}, "./meshes/Door.obj", "./textures/door.png", new Collider(houseDoorPos + houseDoorCol + houseDoorOffset,houseDoorPos - houseDoorCol + houseDoorOffset)},
+
+        //Chair 1 - 2
+        Actor{0,6, outerChair1Pos, Vec3{0.5f,0.6f,1.0f}, "./meshes/Cube.obj", "./textures/door.png", new Collider(outerChair1Pos + outerChair1Col + invisibleOffset,outerChair1Pos - outerChair1Col + invisibleOffset)},
+
+        //Chair 2 - 3
+        Actor{0,30, outerChair2Pos, Vec3{0.5f,0.6f,1.0f}, "./meshes/Cube.obj", "./textures/door.png", new Collider(outerChair2Pos + outerChair2Col + invisibleOffset,outerChair2Pos - outerChair2Col + invisibleOffset)},
+
+        //Window
+        Actor{0,0, outerWindowPos, Vec3{1.0f,1.0f,0.5f}, "./meshes/Cube.obj", "./textures/door.png", new Collider(outerWindowPos + outerWindowCol + invisibleOffset,outerWindowPos - outerWindowCol + invisibleOffset)},
+
+        //Tree 1
+        Actor{0,0, tree1_1Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree1_1Pos + invisibleOffset,tubeCol)},
+        Actor{0,0, tree1_2Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree1_2Pos + invisibleOffset,tubeCol)},
+        Actor{0,0, tree1_3Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree1_3Pos + invisibleOffset,tubeCol)},
+
+        //Tree 2
+        Actor{0,0, tree2_1Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_1Pos + invisibleOffset,tubeCol)},
+        Actor{0,0, tree2_2Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_2Pos + invisibleOffset,tubeCol)},
+        Actor{0,0, tree2_3Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_3Pos + invisibleOffset,tubeCol)},
+        Actor{0,0, tree2_4Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_4Pos + invisibleOffset,tubeCol)},
+        Actor{0,0, tree2_5Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_5Pos + invisibleOffset,tubeCol)},
+        Actor{0,0, tree2_6Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_6Pos + invisibleOffset,tubeCol)},
+        Actor{0,0, tree2_7Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_7Pos + invisibleOffset,tubeCol)},
+        Actor{0,0, tree2_8Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_8Pos + invisibleOffset,tubeCol)},
+        Actor{0,0, tree2_9Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_9Pos + invisibleOffset,tubeCol)},
+
+        //Tree 3
+        Actor{0,0, tree3_1Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree3_1Pos + invisibleOffset,tubeCol)},
+        Actor{0,0, tree3_2Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree3_2Pos + invisibleOffset,tubeCol)},
+        Actor{0,0, tree3_3Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree3_3Pos + invisibleOffset,tubeCol)},
+
+        //Door Post 1
+        Actor{0,0, doorPost1Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(doorPost1Pos + invisibleOffset,tubeCol)},
+
+        //Door Post 2
+        Actor{0,0, doorPost2Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(doorPost2Pos + invisibleOffset,tubeCol)},
+
+    };
+        
 private:
     const size_t MAX_FRAMES_IN_FLIGHT = 2;
     const static int textureCount{ 2 };

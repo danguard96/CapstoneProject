@@ -145,9 +145,13 @@ void VulkanRenderer::initVulkan() {
     createUniformBuffers(sizeof(CameraUBO), cameraBuffers, cameraBuffersMemory);
     createUniformBuffers(sizeof(GlobalLighting), glightingBuffers, glightingBuffersMemory);
 
-    for(int actorI = 0; actorI < 5; actorI++)
+    for(int actorI = 0; actorI < actors.size(); actorI++)
     {
         actorLoad(&actors[actorI]);
+    }
+    for(int actorI = 0; actorI < actors2.size(); actorI++)
+    {
+        actorLoad(&actors2[actorI]);
     }
     
     createCommandBuffers();
@@ -189,8 +193,10 @@ void VulkanRenderer::cleanupSwapChain() {
     destroyUniformBuffer(glightingBuffers, glightingBuffersMemory);
     destroyUniformBuffer(normalsBuffers, normalsBuffersMemory);
 
-    for(int actorI = 0; actorI < 5; actorI++) {
+    for(int actorI = 0; actorI < actors.size(); actorI++) {
         vkDestroyDescriptorPool(device, actors[actorI].descriptorPool, nullptr);
+    }for(int actorI = 0; actorI < actors2.size(); actorI++) {
+        vkDestroyDescriptorPool(device, actors2[actorI].descriptorPool, nullptr);
     }
 }
 
@@ -216,9 +222,14 @@ void VulkanRenderer::cleanupActor(Actor* actor){
 void VulkanRenderer::cleanup() {
     cleanupSwapChain();
 
-    for(int actorI = 0; actorI < 5; actorI++)
+    for(int actorI = 0; actorI < actors.size(); actorI++)
     {
         cleanupActor(&actors[actorI]);
+    }
+
+    for(int actorI = 0; actorI < actors2.size(); actorI++)
+    {
+        cleanupActor(&actors2[actorI]);
     }
 
     vkFreeMemory(device, textureImageMemory, nullptr);
@@ -1269,16 +1280,31 @@ void VulkanRenderer::recordCommandBuffer() {
         
         vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipelineID);
 
-        for(int actorI = 0; actorI < 5; actorI++)
-        {
-            VkBuffer vertexBuffersChair[] = { actors[actorI].modelBufferedMemory.vertBufferID };
-            VkDeviceSize offsetsChair[] = { 0 };
-            vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffersChair, offsetsChair);
-            vkCmdBindIndexBuffer(commandBuffers[i], actors[actorI].modelBufferedMemory.indexBufferID, 0, VK_INDEX_TYPE_UINT32);
-            vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(ModelMatrixPushConst), &actors[actorI].modelMatrixPushConst);
-            vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &actors[actorI].descriptorSets[i], 0, nullptr);
-            vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(actors[actorI].modelBufferedMemory.indexBufferSize)/3, 1, 0, 0, 0);
+        if(scene == 0){
+            for(int actorI = 0; actorI < actors.size(); actorI++)
+            {
+                VkBuffer vertexBuffersChair[] = { actors[actorI].modelBufferedMemory.vertBufferID };
+                VkDeviceSize offsetsChair[] = { 0 };
+                vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffersChair, offsetsChair);
+                vkCmdBindIndexBuffer(commandBuffers[i], actors[actorI].modelBufferedMemory.indexBufferID, 0, VK_INDEX_TYPE_UINT32);
+                vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(ModelMatrixPushConst), &actors[actorI].modelMatrixPushConst);
+                vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &actors[actorI].descriptorSets[i], 0, nullptr);
+                vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(actors[actorI].modelBufferedMemory.indexBufferSize)/3, 1, 0, 0, 0);
+            }
         }
+        else{
+            for(int actorI = 0; actorI < actors2.size(); actorI++)
+            {
+                VkBuffer vertexBuffersChair[] = { actors2[actorI].modelBufferedMemory.vertBufferID };
+                VkDeviceSize offsetsChair[] = { 0 };
+                vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffersChair, offsetsChair);
+                vkCmdBindIndexBuffer(commandBuffers[i], actors2[actorI].modelBufferedMemory.indexBufferID, 0, VK_INDEX_TYPE_UINT32);
+                vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(ModelMatrixPushConst), &actors2[actorI].modelMatrixPushConst);
+                vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &actors2[actorI].descriptorSets[i], 0, nullptr);
+                vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(actors2[actorI].modelBufferedMemory.indexBufferSize)/3, 1, 0, 0, 0);
+            }
+        }
+        
 
         vkCmdEndRenderPass(commandBuffers[i]);
 
@@ -1337,12 +1363,12 @@ void VulkanRenderer::SetSphereModelMatrixPush(Actor* actor, const Matrix4& model
     actor->modelMatrixPushConst.normalMatrix = MMath::transpose(MMath::inverse(modelMatrix));
 }
 
-void VulkanRenderer::SetCameraUBO(const Matrix4& projection, const Matrix4& view) {
+void VulkanRenderer::SetCameraUBO(const Matrix4& projection, const Matrix4& view, const Vec3& viewPosi) {
     cameraUBO.proj = projection;
     cameraUBO.proj[5] *= -1.0f;
 
     cameraUBO.view = view;
-    cameraUBO.lightPos = Vec4(0.0f, 0.0f, 0.0f, 0.0f);
+    cameraUBO.viewPos = viewPosi;
 }
 
 void VulkanRenderer::SetGLightsUBO(const GlobalLighting& glights_) {

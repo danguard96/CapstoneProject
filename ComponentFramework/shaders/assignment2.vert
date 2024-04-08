@@ -8,6 +8,7 @@ layout (location = 2) in  vec2 texCoords;
 layout(binding = 0) uniform CameraUBO {
     mat4 view;
     mat4 proj;
+	vec3 viewPos;
 } ubo;
 
 layout( push_constant ) uniform ModelMatrixPushConst {
@@ -16,16 +17,15 @@ layout( push_constant ) uniform ModelMatrixPushConst {
 } Matrix;
 
 layout (location = 0) out vec3 vertNormal;
-layout (location = 1) out vec3 eyeDir; 
-layout (location = 2) out vec2 fragTextCords;
-layout (location = 3) out vec3 vertPos;
+layout (location = 1) out vec2 fragTextCords;
+layout (location = 2) out vec3 FragPos;
+layout (location = 3) out vec3 viewPos;
 
 void main() {
 	fragTextCords = texCoords;
-	vertNormal = normalize(mat3(Matrix.normalMatrix) * vNormal.xyz); /// Rotate the normal to the correct orientation 
-	vertPos = vec3(ubo.view * Matrix.modelMatrix * vVertex); /// This is the position of the vertex from the origin
-	vec3 vertDir = normalize(vertPos);
-	eyeDir = -vertDir;
+	vertNormal = vNormal.xyz;
+	FragPos = vec3(Matrix.modelMatrix * vVertex);
+	viewPos = ubo.viewPos;
 	
 	gl_Position =  ubo.proj * ubo.view * Matrix.modelMatrix * vVertex; 
 }

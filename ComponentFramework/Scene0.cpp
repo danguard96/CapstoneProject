@@ -9,18 +9,20 @@
 #include "OpenGLRenderer.h"
 #include "Camera.h"
 
-Scene0::Scene0(Renderer *renderer_): 
-	Scene(nullptr),renderer(renderer_), camera(nullptr) {
+Scene0::Scene0(Renderer *renderer_, SceneManager *sceneManager_): 
+	Scene(nullptr),renderer(renderer_), camera(nullptr), sceneManager(sceneManager_) {
 	vRenderer = dynamic_cast<VulkanRenderer*>(renderer_);
 	sound = engine->play2D("./audio/menu.wav", true, true);
+	stepSound = engine->play2D("./audio/steps1.wav", true, true);
 	sound->setVolume(0.3);
 	camera = new Camera();
 	Debug::Info("Created Scene0: ", __FILE__, __LINE__);
 }
 
 Scene0::~Scene0() {
+	engine->stopAllSounds();
+	engine->drop();
 	if(camera) delete camera;
-
 }
 
 bool Scene0::OnCreate() {
@@ -38,7 +40,7 @@ bool Scene0::OnCreate() {
 	case RendererType::OPENGL:
 		break;
 	}
-	cameraPosition = CameraPosition{Vec3{0,0,-5},1,0, 0.5f};
+	cameraPosition = CameraPosition{Vec3{0,-1.2,-5},0,0, new Collider(Vec3{0,1.2,5}, 0.25), new Collider(Vec3{0,1.2,5}, 0.5)};
 
 	return true;
 }
@@ -81,13 +83,19 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 			lookRight = true;
 			break;
 		case SDL_SCANCODE_E:
-			if(MATH::VMath::distance(Vec3{-vRenderer->actors[1].position.x, 0, -vRenderer->actors[1].position.z }, cameraPosition.position) < 1){
+			if(cameraPosition.actionCollider->isColliding(*vRenderer->actors[1].collider)){
 				light = !light;
+				engine->play2D("./audio/lamp.wav");
 			}
-			if(MATH::VMath::distance(Vec3{-vRenderer->actors[0].position.x, 0, -vRenderer->actors[0].position.z }, cameraPosition.position) < 1){
+			if(cameraPosition.actionCollider->isColliding(*vRenderer->actors[0].collider)){
 				sit = !sit;
 			}
-			if(MATH::VMath::distance(Vec3{-vRenderer->actors[2].position.x, 0, -vRenderer->actors[2].position.z }, cameraPosition.position) < 1){
+			if(cameraPosition.actionCollider->isColliding(*vRenderer->actors[4].collider)){
+				sceneManager->ChangeScene(SceneManager::SCENE_NUMBER::SCENE1);
+				return;
+			}
+			if(cameraPosition.actionCollider->isColliding(*vRenderer->actors[2].collider)){
+
 				music = !music;
 				if(music){
 					sound->setIsPaused(false);
@@ -98,7 +106,12 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 			}
 			break;
 		case SDL_SCANCODE_F:
-			doorOpen = true;
+			doorOpen = !doorOpen;
+			if(doorIsClosed)
+				engine->play2D("./audio/doorOpen.wav");
+			if (!doorIsClosed)
+				engine->play2D("./audio/doorClose.wav");
+			vRenderer->actors[3].collider->setActive(false);
 			break; 
 		case SDL_SCANCODE_Z:
 			zoom = true;
@@ -134,9 +147,6 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 		case SDL_SCANCODE_RIGHT:
 			lookRight = false;
 			break;
-		case SDL_SCANCODE_F:
-			doorOpen = false;
-			break;
 		case SDL_SCANCODE_Z:
 			zoom = false;
 			break;
@@ -158,6 +168,14 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 }
 
 void Scene0::Update(const float deltaTime) {
+
+	if(!left && !right && !front && !back){
+		stepSound->setIsPaused(true);
+	}
+	else {
+		stepSound->setIsPaused(false);
+	}
+
 	static float elapsedTime = 0.0f;
 	elapsedTime += deltaTime;
 	if(!sit){
@@ -165,14 +183,17 @@ void Scene0::Update(const float deltaTime) {
 		float lr = (right ? 0.1 : 0 + left ? -0.1 : 0) * 0.01;
 		Vec3 newPos = cameraPosition.position + (Vec3(-sin(cameraPosition.gamma * deg2rad),0,cos(cameraPosition.gamma * deg2rad)) * rad2deg * fb)
 			+ (Vec3(-sin((90 + cameraPosition.gamma) * deg2rad), 0, cos((90 + cameraPosition.gamma) * deg2rad)) * rad2deg * lr);
-		if(
-			MATH::VMath::distance(Vec3{-vRenderer->actors[0].position.x, 0, -vRenderer->actors[0].position.z }, newPos) > vRenderer->actors[0].colliderRadius + cameraPosition.colliderRadius && 
-			MATH::VMath::distance(Vec3{-vRenderer->actors[1].position.x, 0, -vRenderer->actors[1].position.z }, newPos) > vRenderer->actors[1].colliderRadius + cameraPosition.colliderRadius &&
-			MATH::VMath::distance(Vec3{-vRenderer->actors[2].position.x, 0, -vRenderer->actors[2].position.z }, newPos) > vRenderer->actors[2].colliderRadius + cameraPosition.colliderRadius &&
-			MATH::VMath::distance(Vec3{-vRenderer->actors[3].position.x, 0, -vRenderer->actors[3].position.z }, newPos) > vRenderer->actors[3].colliderRadius + cameraPosition.colliderRadius 
-		)
+		Collider temp = *cameraPosition.collider;
+		temp.setPosition(Vec3{-newPos.x, -newPos.y, -newPos.z});
+		bool is_colliding = false;
+		for(int actorI = 0; actorI < vRenderer->actors.size(); actorI++)
 		{
-			cameraPosition.position = newPos;
+			if(!is_colliding && vRenderer->actors[actorI].collider)
+				is_colliding = is_colliding || temp.isColliding(*vRenderer->actors[actorI].collider);
+		}
+		if(!is_colliding)
+		{
+			cameraPosition.setPosition(newPos);
 		}
 	}
 
@@ -186,13 +207,19 @@ void Scene0::Update(const float deltaTime) {
 	}
 
 	if (doorOpen && vRenderer->actors[3].gammaRadianRotation >= 0 && vRenderer->actors[3].gammaRadianRotation < 90) {
-		//vRenderer->actors[3].position += Vec3(0.005f, 0, 0.005f);
 		vRenderer->actors[3].gammaRadianRotation += 1.8f;
+		doorIsClosed = false;
 	}
+
 	if (!doorOpen && vRenderer->actors[3].gammaRadianRotation >= 1.8) {
-		//vRenderer->actors[3].position -= Vec3(0.005f, 0, 0.005f);
 		vRenderer->actors[3].gammaRadianRotation -= 1.8f;
+		doorIsClosed = true;
 	}
+
+	if (!doorOpen && vRenderer->actors[3].gammaRadianRotation <= 1.8) {
+		vRenderer->actors[3].collider->setActive(true);
+	}
+
 	if (zoom && fovy > 25) {
 		fovy-= 0.9;
 		camera->Perspective(fovy, aspectRatio, 0.5f, 40.0f);
@@ -207,41 +234,36 @@ void Scene0::Update(const float deltaTime) {
 
 void Scene0::setMatrix(Actor* a) const{
 	vRenderer->SetModelMatrixPush(a,  MMath::translate(a->position)
-													* MMath::rotate(a->thetaRadianRotation, 1, 0, 0) 
-													* MMath::rotate(a->gammaRadianRotation, 0, 1, 0)  
-													* MMath::scale(a->scale));
+									* MMath::rotate(a->thetaRadianRotation, 1, 0, 0) 
+									* MMath::rotate(a->gammaRadianRotation, 0, 1, 0)  
+									* MMath::scale(a->scale));
 }
 
 void Scene0::Render() const {
 
-	GlobalLighting gl = GlobalLighting{ { LightUBO{ Vec4(0.0f, 0.0f, 10.0f, 1.0f), Vec4(0.03, 0.03, 0.03, 1) } }, 1, 0, distort };
+	GlobalLighting gl = GlobalLighting{ { LightUBO{ Vec4(0.0f, 5.0f, 0.0f, 1.0f), Vec4(1, 1, 1, 1) } }, 1, 0, distort };
 
-	setMatrix(&vRenderer->actors[0]);
-	
-	setMatrix(&vRenderer->actors[1]);
-	
-	setMatrix(&vRenderer->actors[2]);
-	
-	setMatrix(&vRenderer->actors[3]);
-	
-	setMatrix(&vRenderer->actors[4]);
+	for (int i = 0; i < vRenderer->actors.size(); i++)
+	{
+		setMatrix(&vRenderer->actors[i]);
+	}
 
 	if(!sit) {
 		vRenderer->SetCameraUBO(camera->GetProjectionMatrix(),    MMath::rotate(cameraPosition.theta,Vec3(1,0,0)) 
 																* MMath::rotate(cameraPosition.gamma, 0, 1, 0) 
-																* MMath::translate(cameraPosition.position));
+																* MMath::translate(cameraPosition.position), -cameraPosition.position);
 	}
 	else {
 		vRenderer->SetCameraUBO(camera->GetProjectionMatrix(),    MMath::rotate(cameraPosition.theta,Vec3(1,0,0)) 
 																* MMath::rotate(cameraPosition.gamma, 0, 1, 0) 
-																* MMath::translate(Vec3{-vRenderer->actors[0].position.x, 0, -vRenderer->actors[0].position.z }));
+																* MMath::translate(Vec3{-vRenderer->actors[0].position.x, cameraPosition.position.y - 0.0f, -vRenderer->actors[0].position.z}), cameraPosition.position);
 	}
 
 	vRenderer->commitFrame();
 
 	if(light){
-		gl = GlobalLighting{ { LightUBO{ Vec4(0.0f, 0.0f, 10.0f, 1.0f), Vec4(0.03, 0.03, 0.03, 1) },
-							   LightUBO{ Vec4(vRenderer->actors[1].position, 1), Vec4(0.03, 0.03, 0.03, 1)} }, 2, 0, distort };
+		gl = GlobalLighting{ { LightUBO{ Vec4(0.0f, 5.0f, 0.0f, 1.0f), Vec4(1, 1, 1, 1) },
+							   LightUBO{ Vec4(vRenderer->actors[1].position, 1), Vec4(0.3, 0.3, 0.3, 1)} }, 2, 0, distort };
 	}
 
 	vRenderer->SetGLightsUBO(gl);

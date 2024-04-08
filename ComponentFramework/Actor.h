@@ -3,6 +3,7 @@
 #include <string>
 #include "ModelMatrixPushConstant.h"
 #include "VMath.h"
+#include "Collider.h"
 
 struct BufferMemory {
     VkBuffer bufferID;
@@ -28,10 +29,13 @@ public:
     MATH::Vec3 scale;
     std::string model;
     std::string texture;
-    float colliderRadius;
-    Actor(float nThetaRadianRotation, float nGammaRadianRotation, MATH::Vec3 nPosition, MATH::Vec3 nScale, std::string nModel, std::string nTexture, float nColliderRadius):
+    Collider* collider;
+    Actor(float nThetaRadianRotation, float nGammaRadianRotation, MATH::Vec3 nPosition, MATH::Vec3 nScale, std::string nModel, std::string nTexture, Collider* nCollider):
     thetaRadianRotation(nThetaRadianRotation), gammaRadianRotation(nGammaRadianRotation), position(nPosition), scale(nScale), model(nModel), 
-        texture(nTexture), colliderRadius(nColliderRadius) {}
+        texture(nTexture), collider(nCollider) {}
+    Actor(float nThetaRadianRotation, float nGammaRadianRotation, MATH::Vec3 nPosition, MATH::Vec3 nScale, std::string nModel, std::string nTexture):
+    thetaRadianRotation(nThetaRadianRotation), gammaRadianRotation(nGammaRadianRotation), position(nPosition), scale(nScale), model(nModel), 
+        texture(nTexture) {}
     VkImage textureImage;
     VkImageView textureImageView;
     VkSampler imageSampler;

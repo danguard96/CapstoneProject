@@ -38,8 +38,6 @@ bool SceneManager::Initialize(std::string name_, int width_, int height_) {
 		renderer->setRendererType(RendererType::OPENGL);
 		renderer->CreateWindow(name_, width_, height_);
 		renderer->OnCreate();
-			
-		
 		break;
 
 	case RendererType::VULKAN:
@@ -80,6 +78,14 @@ void SceneManager::Run() {
 	}
 }
 
+void SceneManager::ChangeScene(SCENE_NUMBER scene) {
+	if(rendererType == RendererType::VULKAN){
+		VulkanRenderer* vRenderer = dynamic_cast<VulkanRenderer*>(renderer);
+		vRenderer->setScene(scene);
+	}
+	BuildScene(scene);
+}
+
 void SceneManager::GetEvents() {
 	SDL_Event sdlEvent;
 	while (SDL_PollEvent(&sdlEvent)) {
@@ -90,16 +96,24 @@ void SceneManager::GetEvents() {
 		else if (sdlEvent.type == SDL_KEYDOWN) {
 			switch (sdlEvent.key.keysym.scancode) {
 			case SDL_SCANCODE_ESCAPE:
-			case SDL_SCANCODE_Q:
+			/*case SDL_SCANCODE_Q:
 				isRunning = false;
-				return;
+				return;*/
 
 			case SDL_SCANCODE_F1:
-				BuildScene(SCENE1);
+				if(rendererType == RendererType::VULKAN){
+					VulkanRenderer* vRenderer = dynamic_cast<VulkanRenderer*>(renderer);
+					vRenderer->setScene(SCENE0);
+				}
+				BuildScene(SCENE0);
 				break;
 
 			case SDL_SCANCODE_F2:
-				///BuildScene(SCENE2);
+				if(rendererType == RendererType::VULKAN){
+					VulkanRenderer* vRenderer = dynamic_cast<VulkanRenderer*>(renderer);
+					vRenderer->setScene(SCENE1);
+				}
+				BuildScene(SCENE1);
 				break;
 
 			case SDL_SCANCODE_F3:
@@ -115,7 +129,7 @@ void SceneManager::GetEvents() {
 				break;
 
 			case SDL_SCANCODE_F6:
-				BuildScene(SCENE0);
+				//BuildScene(SCENE6);
 				break;
 
 			default:
@@ -142,12 +156,12 @@ void SceneManager::BuildScene(SCENE_NUMBER scene) {
 
 	switch (scene) {
 	case SCENE0:  
-		currentScene = new Scene0(renderer);
+		currentScene = new Scene0(renderer, this);
 		status = currentScene->OnCreate();
 		break;
 
 	case SCENE1:
-		currentScene = new Scene1(renderer);
+		currentScene = new Scene1(renderer, this);
 		status = currentScene->OnCreate();
 		break;
 

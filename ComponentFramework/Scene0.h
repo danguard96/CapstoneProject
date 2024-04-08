@@ -3,19 +3,12 @@
 #include "Scene.h"
 #include "Renderer.h"
 #include "Camera.h"
-#include "VulkanRenderer.h"
+#include "CamPos.h"
+#include "SceneManager.h"
 #include <irrKlang.h>
 using namespace MATH;
-
 /// Forward declarations 
 union SDL_Event;
-
-struct CameraPosition {
-	Vec3 position;
-	float theta;
-	float gamma;
-	float colliderRadius;
-};
 
 class Scene0 : public Scene {
 private:
@@ -32,6 +25,7 @@ private:
 	bool sit = false;
 	bool music = false;
 	bool doorOpen = false;
+	bool doorIsClosed = true;
 	bool zoom = false;
 	float fovy = 45.0f;
 	float aspectRatio;
@@ -46,8 +40,9 @@ private:
 	bool lookLeft = false;
 	VulkanRenderer* vRenderer;
 	void setMatrix(Actor* a) const;
+	SceneManager* sceneManager;
 public:
-	explicit Scene0(Renderer* renderer_);
+	explicit Scene0(Renderer* renderer_, SceneManager* sceneManager_);
 	virtual ~Scene0();
 
 	virtual bool OnCreate() override;
@@ -55,8 +50,9 @@ public:
 	virtual void Update(const float deltaTime) override;
 	virtual void Render() const override;
 	virtual void HandleEvents(const SDL_Event &sdlEvent) override;
-	irrklang::ISoundEngine* engine = irrklang::createIrrKlangDevice();;
+	irrklang::ISoundEngine* engine = irrklang::createIrrKlangDevice();
 	irrklang::ISound* sound;
+	irrklang::ISound* stepSound;
 };
 
 

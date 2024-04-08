@@ -2,10 +2,10 @@
 #extension GL_ARB_separate_shader_objects : enable
 layout(binding = 2) uniform sampler2D texSampler;
 
-layout (location = 0) in vec3 vertNormal;
-layout (location = 1) in vec3 eyeDir; 
-layout (location = 2) in vec2 fragTextCords;
-layout (location = 3) in vec3 vertPos;
+layout (location = 0) in vec3 Normal;
+layout (location = 1) in vec2 fragTextCords;
+layout (location = 2) in vec3 FragPos;
+layout (location = 3) in vec3 viewPos;
 
 struct LightUBO{
 	vec4 position;
@@ -24,18 +24,22 @@ layout (location = 0) out vec4 fragColor;
 //Phong
 vec4 CalcPointLight(LightUBO light)
 {
-    vec4 ks = light.diffuse;
-	vec4 ka = vec4(0.2, 0.2, 0.2, 1.0);
-	vec4 kt = texture(texSampler, fragTextCords);
-	vec3 lightDir = normalize(light.position.xyz - vertPos);
-	vec3 vertDir = normalize(vertPos);
-	float diff = max(dot(vertNormal, lightDir), 0.0);
-	vec3 reflection = normalize(reflect(-lightDir, vertNormal));
-	float spec = max(dot(-vertDir, reflection), 0.0);
-	if(diff > 0.0){
-		spec = pow(spec,14.0);
-	}
-	return 0.3 * kt + (diff * (light.diffuse + kt)) + (spec * ks);
+	vec3 norm = normalize(Normal);
+    vec3 viewDir = normalize(viewPos - FragPos);
+
+	vec3 lightDir = vec3(normalize(light.position - vec4(FragPos,1)));
+    float diff = max(dot(norm, lightDir), 0.0);
+    vec3 reflectDir = reflect(-lightDir, norm);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 0.5);
+    float distance = length(vec3(light.position) - FragPos);
+    float attenuation = 10.0 / (1 + 0.7 * distance + 1 * (distance * distance));
+    vec3 ambient  = vec3(0.5,0.5,0.5)  * vec3(texture(texSampler, fragTextCords));
+    vec3 diffuse  = vec3(light.diffuse)  * diff * vec3(texture(texSampler, fragTextCords));
+    vec3 specular = vec3(1.0,1.0,1.0) * spec * vec3(texture(texSampler, fragTextCords));
+    ambient  *= attenuation;
+    diffuse  *= attenuation;
+    specular *= attenuation;
+    return vec4(ambient + diffuse + specular, 1.0);
 } 
 
 //pink noise
@@ -71,6 +75,6 @@ void main() {
 	for(int i = 0; i < glights.numLights; i++){
 		sum += CalcPointLight(glights.lights[i]);
 	}
-	fragColor = sum * (glights.distort ? noise(vec3(vertPos.x,vertPos.y,glights.frame)) : 1);	
+	fragColor = sum * (glights.distort ? noise(vec3(FragPos.x,FragPos.y,glights.frame)) : 1);	
 } 
 

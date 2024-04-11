@@ -12,9 +12,8 @@ VulkanRenderer::VulkanRenderer() : /// Initialize all the variables
     swapChainExtent{}, swapChainImageFormat{} {
 }
 
-
 VulkanRenderer::~VulkanRenderer() {
-
+    isRunning = false;
 }
 
 SDL_Window* VulkanRenderer::CreateWindow(std::string name_, int width_, int height_) {
@@ -27,6 +26,7 @@ SDL_Window* VulkanRenderer::CreateWindow(std::string name_, int width_, int heig
 
 bool VulkanRenderer::OnCreate(){ 
     initVulkan();
+    nm.initClient("127.0.0.1", 8080, isRunning, *camPos, pi);
     return true;
 }
 void VulkanRenderer::OnDestroy() {
@@ -788,8 +788,9 @@ bool VulkanRenderer::hasStencilComponent(VkFormat format) {
 
 void VulkanRenderer::createTextureImage(const char* filename, VkImage& textureImage) {
     SDL_Surface* image = IMG_Load(filename);
+    SDL_Surface* newImage = SDL_ConvertSurfaceFormat(image, SDL_PixelFormatEnum::SDL_PIXELFORMAT_ABGR8888, 0);
     int bpp = image->format->BytesPerPixel;///image->format
-    VkDeviceSize imageSize = image->w * image->h * bpp;
+    VkDeviceSize imageSize = newImage->pitch * image->h;
 
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
@@ -797,7 +798,7 @@ void VulkanRenderer::createTextureImage(const char* filename, VkImage& textureIm
 
     void* data;
     vkMapMemory(device, stagingBufferMemory, 0, imageSize, 0, &data);
-    memcpy(data, image->pixels, static_cast<size_t>(imageSize));
+    memcpy(data, newImage->pixels, static_cast<size_t>(imageSize));
     vkUnmapMemory(device, stagingBufferMemory);
 
 
@@ -1289,7 +1290,7 @@ void VulkanRenderer::recordCommandBuffer() {
                 vkCmdBindIndexBuffer(commandBuffers[i], actors[actorI].modelBufferedMemory.indexBufferID, 0, VK_INDEX_TYPE_UINT32);
                 vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(ModelMatrixPushConst), &actors[actorI].modelMatrixPushConst);
                 vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &actors[actorI].descriptorSets[i], 0, nullptr);
-                vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(actors[actorI].modelBufferedMemory.indexBufferSize)/3, 1, 0, 0, 0);
+                vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(actors[actorI].modelBufferedMemory.indexBufferSize)/4, 1, 0, 0, 0);
             }
         }
         else{
@@ -1301,7 +1302,7 @@ void VulkanRenderer::recordCommandBuffer() {
                 vkCmdBindIndexBuffer(commandBuffers[i], actors2[actorI].modelBufferedMemory.indexBufferID, 0, VK_INDEX_TYPE_UINT32);
                 vkCmdPushConstants(commandBuffers[i], pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(ModelMatrixPushConst), &actors2[actorI].modelMatrixPushConst);
                 vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &actors2[actorI].descriptorSets[i], 0, nullptr);
-                vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(actors2[actorI].modelBufferedMemory.indexBufferSize)/3, 1, 0, 0, 0);
+                vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(actors2[actorI].modelBufferedMemory.indexBufferSize)/4, 1, 0, 0, 0);
             }
         }
         

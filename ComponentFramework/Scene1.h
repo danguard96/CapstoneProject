@@ -1,10 +1,20 @@
 #ifndef SCENE1_H
 #define SCENE1_H
+#include <glew.h>
+#include <iostream>
+#include <algorithm>
 #include "Scene.h"
 #include "Renderer.h"
 #include "Camera.h"
-#include "CamPos.h"
 #include "SceneManager.h"
+#include "VulkanRenderer.h"
+#include "Debug.h"
+#include "MMath.h"
+#include "Debug.h"
+#include "VMath.h"
+#include "OpenGLRenderer.h"
+#include "Camera.h"
+#include "CameraPosition.h"
 #include <irrKlang.h>
 using namespace MATH;
 
@@ -15,7 +25,7 @@ class Scene1 : public Scene {
 private:
 	const float deg2rad = M_PI / 180;
 	const float rad2deg = 180 / M_PI;
-	CameraPosition cameraPosition;
+	CameraPosition* cameraPosition;
 	Renderer* renderer;
 	Camera* camera;
 	bool zoom = false;

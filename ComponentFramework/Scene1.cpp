@@ -1,13 +1,7 @@
 #include <glew.h>
 #include <iostream>
 #include <algorithm>
-#include "Debug.h"
 #include "Scene1.h"
-#include "MMath.h"
-#include "Debug.h"
-#include "VMath.h"
-#include "OpenGLRenderer.h"
-#include "Camera.h"
 
 Scene1::Scene1(Renderer* renderer_, SceneManager* sceneManager_) :
 	Scene(nullptr), renderer(renderer_), camera(nullptr), sceneManager(sceneManager_) {
@@ -32,14 +26,14 @@ bool Scene1::OnCreate() {
 		SDL_GetWindowSize(dynamic_cast<VulkanRenderer*>(renderer)->GetWindow(), &width, &height);
 		aspectRatio = static_cast<float>(width) / static_cast<float>(height);
 		camera->Perspective(fovy, aspectRatio, 0.01f, 90.0f);
-		camera->LookAt(Vec3(0.0f, 0.0f, 5.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
-		break;
+		camera->LookAt(Vec3(0.0f, 0.0f, 1.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
+		cameraPosition = vRenderer->camPos;
+		cameraPosition->setPosition(Vec3{-1.58,-1.2,-2});// = CameraPosition{ ,0,0, new Collider(Vec3{0,1.2,5}, 0.25), new Collider(Vec3{0,1.2,5}, 0.5) };
+	break;
 
 	case RendererType::OPENGL:
 		break;
 	}
-	cameraPosition = CameraPosition{ Vec3{0,-1.2,-5},0,0, new Collider(Vec3{0,1.2,5}, 0.25), new Collider(Vec3{0,1.2,5}, 0.5) };
-
 	return true;
 }
 
@@ -81,7 +75,7 @@ void Scene1::HandleEvents(const SDL_Event& sdlEvent) {
 			lookRight = true;
 			break;
 		case SDL_SCANCODE_E:
-			if(cameraPosition.actionCollider->isColliding(*vRenderer->actors2[1].collider)){
+			if(cameraPosition->actionCollider->isColliding(*vRenderer->actors2[1].collider)){
 				sceneManager->ChangeScene(SceneManager::SCENE_NUMBER::SCENE0);
 				return;
 			}
@@ -157,9 +151,9 @@ void Scene1::Update(const float deltaTime) {
 	elapsedTime += deltaTime;
     float fb = (front ? 0.1 : 0 + back ? -0.1 : 0) * 0.01;
     float lr = (right ? 0.1 : 0 + left ? -0.1 : 0) * 0.01;
-    Vec3 newPos = cameraPosition.position + (Vec3(-sin(cameraPosition.gamma * deg2rad), 0, cos(cameraPosition.gamma * deg2rad)) * rad2deg * fb)
-        + (Vec3(-sin((90 + cameraPosition.gamma) * deg2rad), 0, cos((90 + cameraPosition.gamma) * deg2rad)) * rad2deg * lr);
-    Collider temp = *cameraPosition.collider;
+    Vec3 newPos = cameraPosition->position + (Vec3(-sin(cameraPosition->gamma * deg2rad), 0, cos(cameraPosition->gamma * deg2rad)) * rad2deg * fb)
+        + (Vec3(-sin((90 + cameraPosition->gamma) * deg2rad), 0, cos((90 + cameraPosition->gamma) * deg2rad)) * rad2deg * lr);
+    Collider temp = *cameraPosition->collider;
     temp.setPosition(Vec3{ -newPos.x, -newPos.y, -newPos.z });
 	bool is_colliding = false;
 	for(int actorI = 0; actorI < vRenderer->actors2.size(); actorI++)
@@ -169,16 +163,16 @@ void Scene1::Update(const float deltaTime) {
 	}
 	if(!is_colliding)
     {
-        cameraPosition.setPosition(newPos);
+        cameraPosition->setPosition(newPos);
     }
 
-	cameraPosition.theta += lookUp ? -2 : 0 + lookDown ? 2 : 0;
+	cameraPosition->theta += lookUp ? -2 : 0 + lookDown ? 2 : 0;
 
-	if (cameraPosition.theta < -90) {
-		cameraPosition.theta = -90;
+	if (cameraPosition->theta < -90) {
+		cameraPosition->theta = -90;
 	}
-	else if (cameraPosition.theta > 90) {
-		cameraPosition.theta = 90;
+	else if (cameraPosition->theta > 90) {
+		cameraPosition->theta = 90;
 	}
 
 	if (zoom && fovy > 25) {
@@ -190,7 +184,7 @@ void Scene1::Update(const float deltaTime) {
 		camera->Perspective(fovy, aspectRatio, 0.5f, 40.0f);
 	}
 
-	cameraPosition.gamma += lookLeft ? -2 : 0 + lookRight ? 2 : 0;
+	cameraPosition->gamma += lookLeft ? -2 : 0 + lookRight ? 2 : 0;
 }
 
 void Scene1::setMatrix(Actor* a) const {
@@ -209,9 +203,9 @@ void Scene1::Render() const {
 		setMatrix(&vRenderer->actors2[i]);
 	}
 
-    vRenderer->SetCameraUBO(camera->GetProjectionMatrix(),    MMath::rotate(cameraPosition.theta,Vec3(1,0,0)) 
-                                                            * MMath::rotate(cameraPosition.gamma, 0, 1, 0) 
-                                                            * MMath::translate(cameraPosition.position), -cameraPosition.position);
+    vRenderer->SetCameraUBO(camera->GetProjectionMatrix(),    MMath::rotate(cameraPosition->theta,1,0,0)
+                                                            * MMath::rotate(cameraPosition->gamma, 0, 1, 0) 
+                                                            * MMath::translate(cameraPosition->position), -cameraPosition->position);
 	vRenderer->commitFrame();
 
 	vRenderer->SetGLightsUBO(gl);

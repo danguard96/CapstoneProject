@@ -1,6 +1,7 @@
 #pragma once
 #include <vulkan/vulkan.h>
 #include <string>
+#include <vector>
 #include "ModelMatrixPushConstant.h"
 #include "VMath.h"
 #include "Collider.h"
@@ -36,6 +37,14 @@ public:
     Actor(float nThetaRadianRotation, float nGammaRadianRotation, MATH::Vec3 nPosition, MATH::Vec3 nScale, std::string nModel, std::string nTexture):
     thetaRadianRotation(nThetaRadianRotation), gammaRadianRotation(nGammaRadianRotation), position(nPosition), scale(nScale), model(nModel), 
         texture(nTexture) {}
+    void move(MATH::Vec3 newPos) {
+        position = newPos;
+        if(collider)
+            collider->setPosition(newPos);
+    }
+    void setTheta(float tTheta){
+        gammaRadianRotation = tTheta;
+    }
     VkImage textureImage;
     VkImageView textureImageView;
     VkSampler imageSampler;

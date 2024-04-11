@@ -1,18 +1,9 @@
-#include <glew.h>
-#include <iostream>
-#include <algorithm>
-#include "Debug.h"
 #include "Scene0.h"
-#include "MMath.h"
-#include "Debug.h"
-#include "VMath.h"
-#include "OpenGLRenderer.h"
-#include "Camera.h"
 
 Scene0::Scene0(Renderer *renderer_, SceneManager *sceneManager_): 
 	Scene(nullptr),renderer(renderer_), camera(nullptr), sceneManager(sceneManager_) {
 	vRenderer = dynamic_cast<VulkanRenderer*>(renderer_);
-	sound = engine->play2D("./audio/menu.wav", true, true);
+	sound = engine->play2D("./audio/song.wav", true, true);
 	stepSound = engine->play2D("./audio/steps1.wav", true, true);
 	sound->setVolume(0.3);
 	camera = new Camera();
@@ -27,7 +18,8 @@ Scene0::~Scene0() {
 
 bool Scene0::OnCreate() {
 	int width = 0, height = 0;
-	switch (renderer->getRendererType()){
+	std::vector<Vec3> path = {Vec3{-10,1.2,-10}, Vec3{-10,1.2,10}, Vec3{10,1.2,10}, Vec3{10,1.2,-10}};
+	switch (renderer->getRendererType()) {
 	case RendererType::VULKAN:
 		
 		SDL_GetWindowSize(dynamic_cast<VulkanRenderer*>(renderer)->GetWindow(), &width, &height);
@@ -35,12 +27,15 @@ bool Scene0::OnCreate() {
 		camera->Perspective(fovy, aspectRatio, 0.01f, 90.0f);
 		camera->LookAt(Vec3(0.0f, 0.0f, 5.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
 		SphereModelMatrix = MMath::translate(Vec3{ 2,0,0 }) * MMath::scale(Vec3{0.5f,0.5f,0.5f});
+		cameraPosition = vRenderer->camPos;
+		cameraPosition->setPosition(Vec3{0,-1.2,-10});
+		vRenderer->actors[5].move(Vec3(-6, -5.75, 2));
+		ai = IA(&vRenderer->actors[5], 0.05, cameraPosition, path);
 		break;
 
 	case RendererType::OPENGL:
 		break;
 	}
-	cameraPosition = CameraPosition{Vec3{0,-1.2,-5},0,0, new Collider(Vec3{0,1.2,5}, 0.25), new Collider(Vec3{0,1.2,5}, 0.5)};
 
 	return true;
 }
@@ -83,18 +78,18 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 			lookRight = true;
 			break;
 		case SDL_SCANCODE_E:
-			if(cameraPosition.actionCollider->isColliding(*vRenderer->actors[1].collider)){
+			if(cameraPosition->actionCollider->isColliding(*vRenderer->actors[1].collider)){
 				light = !light;
 				engine->play2D("./audio/lamp.wav");
 			}
-			if(cameraPosition.actionCollider->isColliding(*vRenderer->actors[0].collider)){
+			if(cameraPosition->actionCollider->isColliding(*vRenderer->actors[0].collider)){
 				sit = !sit;
 			}
-			if(cameraPosition.actionCollider->isColliding(*vRenderer->actors[4].collider)){
+			if(cameraPosition->actionCollider->isColliding(*vRenderer->actors[4].collider)){
 				sceneManager->ChangeScene(SceneManager::SCENE_NUMBER::SCENE1);
 				return;
 			}
-			if(cameraPosition.actionCollider->isColliding(*vRenderer->actors[2].collider)){
+			if(cameraPosition->actionCollider->isColliding(*vRenderer->actors[2].collider)){
 
 				music = !music;
 				if(music){
@@ -103,6 +98,9 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 				else{
 					sound->setIsPaused(true);
 				}
+			}
+			if(cameraPosition->actionCollider->isColliding(*vRenderer->actors[7].collider)){
+				danny = !danny;
 			}
 			break;
 		case SDL_SCANCODE_F:
@@ -181,9 +179,9 @@ void Scene0::Update(const float deltaTime) {
 	if(!sit){
 		float fb = (front ? 0.1 : 0 + back ? -0.1 : 0) * 0.01;
 		float lr = (right ? 0.1 : 0 + left ? -0.1 : 0) * 0.01;
-		Vec3 newPos = cameraPosition.position + (Vec3(-sin(cameraPosition.gamma * deg2rad),0,cos(cameraPosition.gamma * deg2rad)) * rad2deg * fb)
-			+ (Vec3(-sin((90 + cameraPosition.gamma) * deg2rad), 0, cos((90 + cameraPosition.gamma) * deg2rad)) * rad2deg * lr);
-		Collider temp = *cameraPosition.collider;
+		Vec3 newPos = cameraPosition->position + (Vec3(-sin(cameraPosition->gamma * deg2rad),0,cos(cameraPosition->gamma * deg2rad)) * rad2deg * fb)
+			+ (Vec3(-sin((90 + cameraPosition->gamma) * deg2rad), 0, cos((90 + cameraPosition->gamma) * deg2rad)) * rad2deg * lr);
+		Collider temp = *cameraPosition->collider;
 		temp.setPosition(Vec3{-newPos.x, -newPos.y, -newPos.z});
 		bool is_colliding = false;
 		for(int actorI = 0; actorI < vRenderer->actors.size(); actorI++)
@@ -193,17 +191,17 @@ void Scene0::Update(const float deltaTime) {
 		}
 		if(!is_colliding)
 		{
-			cameraPosition.setPosition(newPos);
+			cameraPosition->setPosition(newPos);
 		}
 	}
 
-	cameraPosition.theta += lookUp ? -2 : 0 + lookDown ? 2 : 0;
+	cameraPosition->setTheta(cameraPosition->theta += lookUp ? -2 : 0 + lookDown ? 2 : 0);
 
-	if (cameraPosition.theta < -90) {
-		cameraPosition.theta = -90;
+	if (cameraPosition->theta < -90) {
+		cameraPosition->setTheta(-90);
 	}
-	else if (cameraPosition.theta > 90) {
-		cameraPosition.theta = 90;
+	else if (cameraPosition->theta > 90) {
+		cameraPosition->setTheta(90);
 	}
 
 	if (doorOpen && vRenderer->actors[3].gammaRadianRotation >= 0 && vRenderer->actors[3].gammaRadianRotation < 90) {
@@ -229,7 +227,12 @@ void Scene0::Update(const float deltaTime) {
 		camera->Perspective(fovy, aspectRatio, 0.5f, 40.0f);
 	}
 
-	cameraPosition.gamma += lookLeft ? -2 : 0 + lookRight ? 2 : 0;
+	cameraPosition->gamma += lookLeft ? -2 : 0 + lookRight ? 2 : 0;
+	if(danny){
+		ai.update();
+		if (vRenderer->actors[5].collider && cameraPosition->collider->isColliding(*vRenderer->actors[5].collider))
+			sceneManager->ChangeScene(SceneManager::SCENE_NUMBER::SCENE1);
+	}
 }
 
 void Scene0::setMatrix(Actor* a) const{
@@ -249,15 +252,20 @@ void Scene0::Render() const {
 	}
 
 	if(!sit) {
-		vRenderer->SetCameraUBO(camera->GetProjectionMatrix(),    MMath::rotate(cameraPosition.theta,Vec3(1,0,0)) 
-																* MMath::rotate(cameraPosition.gamma, 0, 1, 0) 
-																* MMath::translate(cameraPosition.position), -cameraPosition.position);
+		vRenderer->SetCameraUBO(camera->GetProjectionMatrix(),   MMath::rotate(cameraPosition->theta,Vec3(1,0,0)) 
+																* MMath::rotate(cameraPosition->gamma, 0, 1, 0) 
+																* MMath::translate(cameraPosition->position), -cameraPosition->position) ;
 	}
 	else {
-		vRenderer->SetCameraUBO(camera->GetProjectionMatrix(),    MMath::rotate(cameraPosition.theta,Vec3(1,0,0)) 
-																* MMath::rotate(cameraPosition.gamma, 0, 1, 0) 
-																* MMath::translate(Vec3{-vRenderer->actors[0].position.x, cameraPosition.position.y - 0.0f, -vRenderer->actors[0].position.z}), cameraPosition.position);
+		vRenderer->SetCameraUBO(camera->GetProjectionMatrix(),    MMath::rotate(cameraPosition->theta,Vec3(1,0,0)) 
+																* MMath::rotate(cameraPosition->gamma, 0, 1, 0) 
+																* MMath::translate(Vec3{-vRenderer->actors[0].position.x, cameraPosition->position.y - 0.0f, -vRenderer->actors[0].position.z}), cameraPosition->position);
 	}
+
+	vRenderer->SetModelMatrixPush(&vRenderer->actors[6], MMath::translate(-vRenderer->pi.pos)
+													  * MMath::rotate(vRenderer->pi.theta,Vec3(1,0,0)) 
+													  * MMath::rotate(vRenderer->pi.gamma, 0, 1, 0)
+													  * MMath::scale(vRenderer->actors[6].scale));
 
 	vRenderer->commitFrame();
 

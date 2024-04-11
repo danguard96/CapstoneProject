@@ -1,10 +1,22 @@
 #ifndef SCENE0_H
 #define SCENE0_H
+#include <glew.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
 #include "Scene.h"
 #include "Renderer.h"
 #include "Camera.h"
-#include "CamPos.h"
 #include "SceneManager.h"
+#include "VulkanRenderer.h"
+#include "Debug.h"
+#include "MMath.h"
+#include "Debug.h"
+#include "VMath.h"
+#include "OpenGLRenderer.h"
+#include "Camera.h"
+#include "CameraPosition.h"
+#include "IA.h"
 #include <irrKlang.h>
 using namespace MATH;
 /// Forward declarations 
@@ -12,9 +24,10 @@ union SDL_Event;
 
 class Scene0 : public Scene {
 private:
+	IA ai;
 	const float deg2rad = M_PI / 180;
 	const float rad2deg = 180 / M_PI;
-	CameraPosition cameraPosition;
+	CameraPosition *cameraPosition;
 	Renderer *renderer;
 	Camera *camera;
 	Matrix4 mariosModelMatrix;
@@ -38,6 +51,7 @@ private:
 	bool lookDown = false;
 	bool lookRight = false;
 	bool lookLeft = false;
+	bool danny = false;
 	VulkanRenderer* vRenderer;
 	void setMatrix(Actor* a) const;
 	SceneManager* sceneManager;

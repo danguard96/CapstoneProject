@@ -148,12 +148,14 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="Hash.cpp" />
+    <ClCompile Include="NetworkManager.cpp" />
     <ClCompile Include="OpenGLRenderer.cpp" />
     <ClCompile Include="Scene1.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MMath.cpp" />
     <ClCompile Include="Scene0.cpp" />
     <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="ServerNetworkManager.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="VMath.cpp" />
     <ClCompile Include="VulkanRenderer.cpp" />
@@ -166,7 +168,9 @@
     <ClInclude Include="Debug.h" />
     <ClInclude Include="GlobalLighting.h" />
     <ClInclude Include="Hash.h" />
+    <ClInclude Include="IA.h" />
     <ClInclude Include="ModelMatrixPushConstant.h" />
+    <ClInclude Include="NetworkManager.h" />
     <ClInclude Include="OpenGLRenderer.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Scene1.h" />
@@ -176,6 +180,7 @@
     <ClInclude Include="Plane.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Scene0.h" />
+    <ClInclude Include="ServerNetworkManager.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="tiny_obj_loader.h" />

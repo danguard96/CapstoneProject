@@ -1,3 +1,4 @@
+#pragma once
 #include "VMath.h"
 #include <algorithm>
 #include <math.h>

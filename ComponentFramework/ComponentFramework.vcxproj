@@ -163,7 +163,7 @@
   <ItemGroup>
     <ClInclude Include="Actor.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="CamPos.h" />
+    <ClInclude Include="CameraPosition.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="GlobalLighting.h" />
@@ -172,6 +172,7 @@
     <ClInclude Include="ModelMatrixPushConstant.h" />
     <ClInclude Include="NetworkManager.h" />
     <ClInclude Include="OpenGLRenderer.h" />
+    <ClInclude Include="PlayerInfo.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Scene1.h" />
     <ClInclude Include="SceneManager.h" />

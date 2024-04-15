@@ -230,9 +230,13 @@ public:
     Vec3 cabinetPos = Vec3(-1.875f, 0.27f, 0.0f);
 
     //Bedroom
-    Vec3 bedPos = Vec3(5.0f, 0.0f, 0.0f);
-    Vec3 nightstandPos_01 = Vec3(5.0f, 0.0f, -2.0f);
-    Vec3 nightstandPos_02 = Vec3(5.0f, 0.0f, 2.0f);
+    Vec3 bedPos = Vec3(10.0f, 0.0f, 0.0f);
+    Vec3 nightstandPos_01 = Vec3(11.0f, 0.0f, -1.5f);
+    Vec3 nightstandPos_02 = Vec3(11.0f, 0.0f, 1.5f);
+    Vec3 deskPos = Vec3(0.1f, 0.0f, 0.0f);
+    Vec3 TVStandRoomPos = Vec3(5.0f, 0.0f, -4.0f);
+    Vec3 gamecubeRoomPos = Vec3(5.0f, 0.4f, -4.0f);
+    Vec3 sofaRoomPos = Vec3(5.0f, 0.0f, 0.0f);
 
     //Main Walls
     Vec3 floorPos = Vec3(0, 0, 0);
@@ -361,7 +365,15 @@ public:
     Vec3 kitchenSinkCol = Vec3(0.25f, 2.0f, 0.5f);
     Vec3 dishwasherOffset = Vec3(-0.75f, 0.0f, -0.25f);
     Vec3 dishwasherCol = Vec3(0.25f, 2.0f, 0.25f);
+    Vec3 tableCol = Vec3(0.25f, 2.0f, 0.75f);
 
+    //Living Room
+    Vec3 smallTableCol = Vec3(0.1875f, 2.0f, 0.5625f);
+
+    //Bedroom
+    Vec3 bedCol = Vec3(1.0f, 2.0f, 0.75f);
+    Vec3 nightstandCol = Vec3(1.0f, 2.0f, 0.75f);
+    Vec3 deskCol = Vec3(0.25f, 2.0f, 0.75f);
 
     //Main Walls
     Vec3 floorCol = Vec3(100.0f, 0.001f, 100.0f);
@@ -454,7 +466,7 @@ public:
 
     float tubeCol = 0.2f;
 
-    std::array<Actor, 132> actors = {
+    std::array<Actor, 136> actors = {
         //Chair - 0
         Actor{0,-90, chairPos_01, Vec3{.025f,.025f,.025f}, "./meshes/Chair.obj", "./textures/chair.png", new Collider(chairPos_01 + chairCol,chairPos_01 - chairCol)},
 
@@ -522,18 +534,22 @@ public:
         Actor{ 0,90, kitchenSinkPos, Vec3{1.0f,1.0f,1.0f}, "./meshes/Kitchen_Sink.obj", "./textures/toilet.png", new Collider(kitchenSinkPos + kitchenSinkCol,kitchenSinkPos - kitchenSinkCol)},
         Actor{ 0,180, dishwasherPos, Vec3{0.001f,0.001f,0.001f}, "./meshes/Dishwasher.obj", "./textures/toilet.png", new Collider(dishwasherPos + kitchenSinkCol + dishwasherOffset,dishwasherPos - kitchenSinkCol + dishwasherOffset)},
         Actor{ 0,90, kitchenCabinetPos_02, Vec3{0.012f,0.012f,0.012f}, "./meshes/Cabinet.obj", "./textures/toilet.png", new Collider(kitchenCabinetPos_02 + washroomCabinetCol_01,kitchenCabinetPos_02 - washroomCabinetCol_01)},
-        Actor{ 0,90, tablePos, Vec3{0.012f,0.012f,0.012f}, "./meshes/Table.obj", "./textures/wood.png", new Collider(tablePos + washroomCabinetCol_01,tablePos - washroomCabinetCol_01)},
+        Actor{ 0,90, tablePos, Vec3{0.012f,0.012f,0.012f}, "./meshes/Table.obj", "./textures/wood.png", new Collider(tablePos + tableCol,tablePos - tableCol)},
 
         //Living Room
         Actor{ 0,-90, TVStandPos, Vec3{0.009f,0.009f,0.009f}, "./meshes/TVStand.obj", "./textures/TVStand.png", new Collider(TVStandPos + washroomCabinetCol_01,TVStandPos - washroomCabinetCol_01)},
         Actor{ 0,-90, sofaPos, Vec3{0.005f,0.005f,0.005f}, "./meshes/Sofa.obj", "./textures/sofa.png", new Collider(sofaPos + washroomCabinetCol_01,sofaPos - washroomCabinetCol_01)},
-        Actor{ 0,90, smallTablePos, Vec3{0.009f,0.009f,0.009f}, "./meshes/Table.obj", "./textures/wood.png", new Collider(smallTablePos + washroomCabinetCol_01,smallTablePos - washroomCabinetCol_01)},
+        Actor{ 0,90, smallTablePos, Vec3{0.009f,0.009f,0.009f}, "./meshes/Table.obj", "./textures/wood.png", new Collider(smallTablePos + smallTableCol,smallTablePos - smallTableCol)},
         Actor{ 0,-90, cabinetPos, Vec3{0.012f,0.012f,0.012f}, "./meshes/Cabinet.obj", "./textures/chair.png", new Collider(cabinetPos + washroomCabinetCol_01,cabinetPos - washroomCabinetCol_01)},
 
         //Bedroom
-        Actor{ 0,180, bedPos, Vec3{0.0025f,0.0025f,0.0025f}, "./meshes/Bed.obj", "./textures/wood.png", new Collider(bedPos + washroomCabinetCol_01,bedPos - washroomCabinetCol_01)},
-        Actor{ 0,-90, nightstandPos_01, Vec3{0.009f,0.009f,0.009f}, "./meshes/Night_Stand.obj", "./textures/wood.png", new Collider(nightstandPos_01 + washroomCabinetCol_01,nightstandPos_01 - washroomCabinetCol_01)},
-        Actor{ 0,-90, nightstandPos_02, Vec3{0.009f,0.009f,0.009f}, "./meshes/Night_Stand.obj", "./textures/wood.png", new Collider(nightstandPos_02 + washroomCabinetCol_01,nightstandPos_02 - washroomCabinetCol_01)},
+        Actor{ 0,-90, bedPos, Vec3{0.01f,0.01f,0.01f}, "./meshes/Bed.obj", "./textures/bed.png", new Collider(bedPos + bedCol,bedPos - bedCol)},
+        Actor{ 0,90, nightstandPos_01, Vec3{0.009f,0.009f,0.009f}, "./meshes/Night_Stand.obj", "./textures/wood.png", new Collider(nightstandPos_01 + washroomCabinetCol_01,nightstandPos_01 - washroomCabinetCol_01)},
+        Actor{ 0,90, nightstandPos_02, Vec3{0.009f,0.009f,0.009f}, "./meshes/Night_Stand.obj", "./textures/wood.png", new Collider(nightstandPos_02 + washroomCabinetCol_01,nightstandPos_02 - washroomCabinetCol_01)},
+        Actor{ 0,0, deskPos, Vec3{0.2f,0.2f,0.2f}, "./meshes/Desk.obj", "./textures/desk.png", new Collider(deskPos + deskCol,deskPos - deskCol)},
+        Actor{ 0,180, TVStandRoomPos, Vec3{0.009f,0.009f,0.009f}, "./meshes/TVStand.obj", "./textures/TVStand.png", new Collider(TVStandRoomPos + washroomCabinetCol_02,TVStandRoomPos - washroomCabinetCol_02)},
+        Actor{0,0, gamecubeRoomPos, Vec3{.0015f,.0015f,.0015f}, "./meshes/Gamecube.obj", "./textures/gamecube.png", new Collider(gamecubeRoomPos + gamecubeCol,gamecubeRoomPos - gamecubeCol)},
+        Actor{ 0,180, sofaRoomPos, Vec3{0.005f,0.005f,0.005f}, "./meshes/Sofa.obj", "./textures/sofa.png", new Collider(sofaRoomPos + washroomCabinetCol_02,sofaRoomPos - washroomCabinetCol_02)},
 
         //Floor
         Actor{0,0, floorPos, Vec3{100.0f,0.001f,100.0f}, "./meshes/cube.obj", "./textures/wood.png", new Collider(floorPos + floorCol,floorPos - floorCol)},
@@ -679,7 +695,7 @@ public:
     std::array<Actor, 22> actors2 = {
 
         //House - 0
-        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Cube.obj", "./textures/wood.png", new Collider(Vec3(3.3f, 4.3f, 1.3f), Vec3(-3.3f, -2.3f, -5.3f))},
+        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/House.obj", "./textures/wood.png", new Collider(Vec3(3.3f, 4.3f, 1.3f), Vec3(-3.3f, -2.3f, -5.3f))},
 
         //House Door - 1
         Actor{0,0, houseDoorPos, Vec3{.009f,.01f,.009f}, "./meshes/Door.obj", "./textures/door.png", new Collider(houseDoorPos + houseDoorCol + houseDoorOffset,houseDoorPos - houseDoorCol + houseDoorOffset)},

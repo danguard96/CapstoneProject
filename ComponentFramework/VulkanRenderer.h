@@ -422,7 +422,7 @@ public:
 
     Vec3 housePos = Vec3(0, -0.5f, 0);
 
-    Vec3 houseDoorPos = Vec3(0.9f, -0.27f, 1.3f);
+    Vec3 houseDoorPos = Vec3(0.85f, -0.27f, 1.25f);
 
     Vec3 outerChair1Pos = Vec3(-5.95f, -9.75f, 0.25f);
     Vec3 outerChair2Pos = Vec3(-4.35f, -9.75f, 1.3f);
@@ -449,6 +449,12 @@ public:
 
     Vec3 doorPost1Pos = Vec3(2.6f, -8.8f, 2.25f);
     Vec3 doorPost2Pos = Vec3(0.255f, -8.8f, 2.25f);
+
+    Vec3 skyboxUp = Vec3(0.0f, 50.0f, 0.0f);
+    Vec3 skyboxFront = Vec3(0.0f, 0.0f, -50.0f);
+    Vec3 skyboxBack = Vec3(0.0f, 0.0f, 50.0f);
+    Vec3 skyboxLeft = Vec3(-50.0f, 0.0f, 0.0f);
+    Vec3 skyboxRight = Vec3(50.0f, 0.0f, 0.0f);
 
     //-------------Colliders - Outside---------------
     
@@ -692,10 +698,10 @@ public:
         Actor{ 0,90, cornerPos_27, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_Corner_02.obj", "./textures/wall.png" },
     };
 
-    std::array<Actor, 22> actors2 = {
+    std::array<Actor, 37> actors2 = {
 
         //House - 0
-        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/House.obj", "./textures/wood.png", new Collider(Vec3(3.3f, 4.3f, 1.3f), Vec3(-3.3f, -2.3f, -5.3f))},
+        Actor{0,0, housePos, Vec3{0.01f,0.01f,0.01f}, "./meshes/Sphere.obj", "./textures/wood.png", new Collider(Vec3(3.3f, 4.3f, 1.3f), Vec3(-3.3f, -2.3f, -5.3f))},
 
         //House Door - 1
         Actor{0,0, houseDoorPos, Vec3{.009f,.01f,.009f}, "./meshes/Door.obj", "./textures/door.png", new Collider(houseDoorPos + houseDoorCol + houseDoorOffset,houseDoorPos - houseDoorCol + houseDoorOffset)},
@@ -705,9 +711,6 @@ public:
 
         //Chair 2 - 3
         Actor{0,30, outerChair2Pos, Vec3{0.5f,0.6f,1.0f}, "./meshes/Cube.obj", "./textures/door.png", new Collider(outerChair2Pos + outerChair2Col + invisibleOffset,outerChair2Pos - outerChair2Col + invisibleOffset)},
-
-        //Window
-        Actor{0,0, outerWindowPos, Vec3{1.0f,1.0f,0.5f}, "./meshes/Cube.obj", "./textures/door.png", new Collider(outerWindowPos + outerWindowCol + invisibleOffset,outerWindowPos - outerWindowCol + invisibleOffset)},
 
         //Tree 1
         Actor{0,0, tree1_1Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree1_1Pos + invisibleOffset,tubeCol)},
@@ -735,7 +738,31 @@ public:
 
         //Door Post 2
         Actor{0,0, doorPost2Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(doorPost2Pos + invisibleOffset,tubeCol)},
+        
+        //House
+        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Bushes.obj", "./textures/leaf.png", new Collider(Vec3(3.3f, 4.3f, 1.3f), Vec3(-3.3f, -2.3f, -5.3f))},
+        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Out_Chairs.obj", "./textures/chair_cloth.png", new Collider(Vec3(3.3f, 4.3f, 1.3f), Vec3(-3.3f, -2.3f, -5.3f))},
+        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Front_Wall.obj", "./textures/front_wall.png", new Collider(Vec3(3.3f, 4.3f, 1.3f), Vec3(-3.3f, -2.3f, -5.3f))},
+        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Grass.obj", "./textures/leaf.png", new Collider(Vec3(3.3f, 4.3f, 1.3f), Vec3(-3.3f, -2.3f, -5.3f))},
+        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Land.obj", "./textures/land.png", new Collider(Vec3(3.3f, 4.3f, 1.3f), Vec3(-3.3f, -2.3f, -5.3f))},
+        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Main_Frame.obj", "./textures/wood.png", new Collider(Vec3(3.3f, 4.3f, 1.3f), Vec3(-3.3f, -2.3f, -5.3f))},
+        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Overroof.obj", "./textures/brick.png", new Collider(Vec3(3.3f, 4.3f, 1.3f), Vec3(-3.3f, -2.3f, -5.3f))},
+        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Palms1.obj", "./textures/wood.png", new Collider(Vec3(3.3f, 4.3f, 1.3f), Vec3(-3.3f, -2.3f, -5.3f))},
+        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Palms2.obj", "./textures/leaf.png", new Collider(Vec3(3.3f, 4.3f, 1.3f), Vec3(-3.3f, -2.3f, -5.3f))},
+        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Palms3.obj", "./textures/leaf.png", new Collider(Vec3(3.3f, 4.3f, 1.3f), Vec3(-3.3f, -2.3f, -5.3f))},
+        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Rocks.obj", "./textures/rock.png", new Collider(Vec3(3.3f, 4.3f, 1.3f), Vec3(-3.3f, -2.3f, -5.3f))},
+        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Roof.obj", "./textures/brick.png", new Collider(Vec3(3.3f, 4.3f, 1.3f), Vec3(-3.3f, -2.3f, -5.3f))},
+        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Trunk_Chairs.obj", "./textures/wood.png", new Collider(Vec3(3.3f, 4.3f, 1.3f), Vec3(-3.3f, -2.3f, -5.3f))},
+        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Vent.obj", "./textures/metal.png", new Collider(Vec3(3.3f, 4.3f, 1.3f), Vec3(-3.3f, -2.3f, -5.3f))},
+        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Walls.obj", "./textures/front_wall.png", new Collider(Vec3(3.3f, 4.3f, 1.3f), Vec3(-3.3f, -2.3f, -5.3f))},
+        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Windows.obj", "./textures/glass.png", new Collider(outerWindowPos + outerWindowCol + invisibleOffset,outerWindowPos - outerWindowCol + invisibleOffset)},
 
+        //Skybox
+        //Actor{0,0, skyboxUp, Vec3{100.0f,0.001f,100.0f}, "./meshes/Cube.obj", "./textures/glass.png"},
+        //Actor{0,0, skyboxFront, Vec3{100.0f,100.0f,0.001f}, "./meshes/Cube.obj", "./textures/glass.png"},
+        //Actor{0,0, skyboxBack, Vec3{100.0f,100.0f,0.001f}, "./meshes/Cube.obj", "./textures/glass.png"},
+        //Actor{0,0, skyboxLeft, Vec3{0.001f,100.0f,100.0f}, "./meshes/Cube.obj", "./textures/glass.png"},
+        //Actor{0,0, skyboxRight, Vec3{0.001f,100.0f,100.0f}, "./meshes/Cube.obj", "./textures/glass.png"},
     };
         
 private:

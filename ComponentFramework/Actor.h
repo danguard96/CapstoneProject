@@ -31,6 +31,7 @@ public:
     std::string model;
     std::string texture;
     Collider* collider;
+    Actor();
     Actor(float nThetaRadianRotation, float nGammaRadianRotation, MATH::Vec3 nPosition, MATH::Vec3 nScale, std::string nModel, std::string nTexture, Collider* nCollider):
     thetaRadianRotation(nThetaRadianRotation), gammaRadianRotation(nGammaRadianRotation), position(nPosition), scale(nScale), model(nModel), 
         texture(nTexture), collider(nCollider) {}

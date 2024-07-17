@@ -75,7 +75,7 @@ void Scene1::HandleEvents(const SDL_Event& sdlEvent) {
 			lookRight = true;
 			break;
 		case SDL_SCANCODE_E:
-			if(cameraPosition->actionCollider->isColliding(*vRenderer->actors2[1].collider)){
+			if(cameraPosition->actionCollider->isColliding(*vRenderer->actors2["door"].collider)) {
 				sceneManager->ChangeScene(SceneManager::SCENE_NUMBER::SCENE0);
 				return;
 			}
@@ -149,22 +149,27 @@ void Scene1::Update(const float deltaTime) {
 
 	static float elapsedTime = 0.0f;
 	elapsedTime += deltaTime;
-    float fb = (front ? 0.1 : 0 + back ? -0.1 : 0) * 0.01;
-    float lr = (right ? 0.1 : 0 + left ? -0.1 : 0) * 0.01;
-    Vec3 newPos = cameraPosition->position + (Vec3(-sin(cameraPosition->gamma * deg2rad), 0, cos(cameraPosition->gamma * deg2rad)) * rad2deg * fb)
-        + (Vec3(-sin((90 + cameraPosition->gamma) * deg2rad), 0, cos((90 + cameraPosition->gamma) * deg2rad)) * rad2deg * lr);
-    Collider temp = *cameraPosition->collider;
-    temp.setPosition(Vec3{ -newPos.x, -newPos.y, -newPos.z });
+	float fb = (front ? 0.125f : 0 + back ? -0.075f : 0) * 0.01;
+	float lr = (right ? 0.1 : 0 + left ? -0.1 : 0) * 0.01;
+	Vec3 movement = (
+		Vec3(-sin(cameraPosition->gamma * deg2rad), 0, cos(cameraPosition->gamma * deg2rad)) * rad2deg * fb)
+		+ (
+			Vec3(-sin((90 + cameraPosition->gamma) * deg2rad), 0, cos((90 + cameraPosition->gamma) * deg2rad)) * rad2deg * lr);
+	if (MATH::VMath::mag(movement) > 0.001f)
+		movement = MATH::VMath::normalize(movement) * 0.1;
+	Vec3 newPos = cameraPosition->position + movement;
+	Collider temp = *cameraPosition->collider;
+	temp.setPosition(Vec3{ -newPos.x, -newPos.y, -newPos.z });
 	bool is_colliding = false;
-	for(int actorI = 0; actorI < vRenderer->actors2.size(); actorI++)
+	for (auto i : vRenderer->actors2)
 	{
-		if(!is_colliding && vRenderer->actors2[actorI].collider)
-			is_colliding = is_colliding || temp.isColliding(*vRenderer->actors2[actorI].collider);
+		if (!is_colliding && i.second.collider)
+			is_colliding = is_colliding || temp.isColliding(*i.second.collider);
 	}
-	if(!is_colliding)
-    {
-        cameraPosition->setPosition(newPos);
-    }
+	if (!is_colliding)
+	{
+		cameraPosition->setPosition(newPos);
+	}
 
 	cameraPosition->theta += lookUp ? -2 : 0 + lookDown ? 2 : 0;
 
@@ -196,11 +201,12 @@ void Scene1::setMatrix(Actor* a) const {
 
 void Scene1::Render() const {
 
-	GlobalLighting gl = GlobalLighting{ { LightUBO{ Vec4(0.0f, 0.0f, 10.0f, 1.0f), Vec4(0.03, 0.03, 0.03, 1) } }, 1, 0, distort };
+	GlobalLighting gl = GlobalLighting{ { LightUBO{ Vec4(0.0f, 50.0f, 0.0f, 1.0f), Vec4(0.9, 0.9, 0.8, 1)}}, 1, 0, distort};
 
-	for (int i = 0; i < vRenderer->actors2.size(); i++)
+	for (auto i : vRenderer->actors2)
 	{
-		setMatrix(&vRenderer->actors2[i]);
+		setMatrix(&i.second);
+		vRenderer->actors2.insert_or_assign(i.first, i.second);
 	}
 
     vRenderer->SetCameraUBO(camera->GetProjectionMatrix(),    MMath::rotate(cameraPosition->theta,1,0,0)

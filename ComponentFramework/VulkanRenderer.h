@@ -15,9 +15,12 @@
 #include <cstdint>
 #include <optional>
 #include <set>
+#include <map>
 #include <unordered_map>
 #include <array>
 #include <chrono>
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 #include "VMath.h"
 #include "MMath.h"
@@ -160,11 +163,14 @@ public:
     void setScene(int scn){
         scene = scn;
     }
+    void stopRunning() {
+        isRunning = false;
+    }
 
 
     //----------------------------------------------------------------
 
-    //-------------Asset Positions - Inside---------------
+     //-------------Asset Positions - Inside---------------
 
     Vec3 chairPos_01 = Vec3(-8, 0, 8.5f);
     Vec3 chairPos_02 = Vec3(-8, 0, 9.5f);
@@ -347,7 +353,7 @@ public:
     float ghostCol = 0.4f;
 
     Vec3 gamecubeCol = Vec3(0.15f, 2.0f, 0.15f);
-    
+
     Vec3 plantOffset = Vec3(0.0f, 1.2f, 0.0f);
     float plantCol = 0.4f;
 
@@ -366,10 +372,17 @@ public:
     Vec3 dishwasherOffset = Vec3(-0.75f, 0.0f, -0.25f);
     Vec3 dishwasherCol = Vec3(0.25f, 2.0f, 0.25f);
     Vec3 tableCol = Vec3(0.25f, 2.0f, 0.75f);
+<<<<<<< Updated upstream
 
     //Living Room
     Vec3 smallTableCol = Vec3(0.1875f, 2.0f, 0.5625f);
 
+=======
+
+    //Living Room
+    Vec3 smallTableCol = Vec3(0.1875f, 2.0f, 0.5625f);
+
+>>>>>>> Stashed changes
     //Bedroom
     Vec3 bedCol = Vec3(1.0f, 2.0f, 0.75f);
     Vec3 nightstandCol = Vec3(1.0f, 2.0f, 0.75f);
@@ -382,7 +395,7 @@ public:
     Vec3 wallNorthCol = Vec3(16.0f, 3.0f, 0.001f);
     Vec3 wallSouthCol = Vec3(16.0f, 3.0f, 0.001f);
     Vec3 ceilingCol = Vec3();
-    
+
     //Big Walls
     Vec3 innerWallOffset_01 = Vec3(1.5f, 0.0f, 0.05f);
     Vec3 innerWallCol_01 = Vec3(1.5f, 3.0f, 0.05f);
@@ -417,7 +430,7 @@ public:
     Vec3 cornerCol = Vec3(0.5f, 3.0f, 0.5f);
 
     //----------------------------------------------------------------
-    
+
     //-------------Asset Positions - Outside---------------
 
     Vec3 housePos = Vec3(0, -0.5f, 0);
@@ -457,7 +470,7 @@ public:
     Vec3 skyboxRight = Vec3(50.0f, 0.0f, 0.0f);
 
     //-------------Colliders - Outside---------------
-    
+
     Vec3 invisibleOffset = Vec3(0, 10, 0);
 
     Vec3 houseCol = Vec3(1.25f, 1.5f, 1.25f);
@@ -474,10 +487,10 @@ public:
 
     std::array<Actor, 136> actors = {
         //Chair - 0
-        Actor{0,-90, chairPos_01, Vec3{.025f,.025f,.025f}, "./meshes/Chair.obj", "./textures/chair.png", new Collider(chairPos_01 + chairCol,chairPos_01 - chairCol)},
+        Actor{0,-90, chairPos_01, Vec3{.025f,.025f,.025f}, "./meshes/Chair.obj", "./textures/chair.png", new Collider(chairPos_01 + chairCol,chairPos_01 - chairCol)}                                               ,
 
         //Lamp - 1
-        Actor{0,0, lampPos, Vec3{.01f,.01f,.01f}, "./meshes/Lamp.obj", "./textures/lamp.png", new Collider(lampPos, lampCol)},
+        Actor{0,0, lampPos, Vec3{.01f,.01f,.01f}, "./meshes/Lamp.obj", "./textures/lamp.png", new Collider(lampPos, lampCol)}                                                                                       ,
 
         //Radio - 2
         Actor{0,-90, radioPos, Vec3{.0025f,.0025f,.0025f}, "./meshes/Radio.obj", "./textures/radio.png", new Collider(radioPos + radioCol,radioPos - radioCol)},
@@ -490,7 +503,7 @@ public:
 
         //Ghost - 5
         Actor{0,0, ghostPos, Vec3{.012f,.012f,.012f}, "./meshes/Ghost.obj", "./textures/ghost.png", new Collider(ghostPos, ghostCol)},
-        
+
         //Sphere - 6
         Actor{0,0, spherePos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Sphere.obj", "./textures/ceiling.png"},
 
@@ -498,12 +511,16 @@ public:
         Actor{0,90, gamecubePos, Vec3{.0015f,.0015f,.0015f}, "./meshes/Gamecube.obj", "./textures/gamecube.png", new Collider(gamecubePos + gamecubeCol,gamecubePos - gamecubeCol)},
 
         //Washroom Door - 8
-        Actor{0,0, washroomDoorPos, Vec3{.0082f,.0082f,.0082f}, "./meshes/Door.obj", "./textures/door.png"/*, new Collider(washroomDoorPos + washroomDoorCol + washroomDoorOffset,washroomDoorPos - washroomDoorCol + washroomDoorOffset)*/},
+        Actor{0,0, washroomDoorPos, Vec3{.0082f,.0082f,.0082f}, "./meshes/Door.obj", "./textures/door.png"},
 
-        //Chairs - 9, 10, 11
+        //Chairs - 9, 10, 11, 12, 13
         Actor{0,-90, chairPos_02, Vec3{.025f,.025f,.025f}, "./meshes/Chair.obj", "./textures/chair.png", new Collider(chairPos_02 + chairCol,chairPos_02 - chairCol)},
         Actor{0,90, chairPos_03, Vec3{.025f,.025f,.025f}, "./meshes/Chair.obj", "./textures/chair.png", new Collider(chairPos_03 + chairCol,chairPos_03 - chairCol)},
         Actor{0,90, chairPos_04, Vec3{.025f,.025f,.025f}, "./meshes/Chair.obj", "./textures/chair.png", new Collider(chairPos_04 + chairCol,chairPos_04 - chairCol)},
+        Actor{ 0,180, sofaRoomPos, Vec3{0.005f,0.005f,0.005f}, "./meshes/Sofa.obj", "./textures/sofa.png", new Collider(sofaRoomPos + washroomCabinetCol_02,sofaRoomPos - washroomCabinetCol_02)},
+        Actor{ 0,-90, sofaPos, Vec3{0.005f,0.005f,0.005f}, "./meshes/Sofa.obj", "./textures/sofa.png", new Collider(sofaPos + washroomCabinetCol_01,sofaPos - washroomCabinetCol_01)},
+        Actor{ 0,-90, bedPos, Vec3{0.01f,0.01f,0.01f}, "./meshes/Bed.obj", "./textures/bed.png", new Collider(bedPos + bedCol,bedPos - bedCol)},
+
 
         //Plants
         Actor{ 0,-90, plantPos_01, Vec3{0.05f,0.05f,0.05f}, "./meshes/Plant.obj", "./textures/plant.png", new Collider(plantPos_01 + plantOffset, plantCol)},
@@ -544,19 +561,29 @@ public:
 
         //Living Room
         Actor{ 0,-90, TVStandPos, Vec3{0.009f,0.009f,0.009f}, "./meshes/TVStand.obj", "./textures/TVStand.png", new Collider(TVStandPos + washroomCabinetCol_01,TVStandPos - washroomCabinetCol_01)},
+<<<<<<< Updated upstream
         Actor{ 0,-90, sofaPos, Vec3{0.005f,0.005f,0.005f}, "./meshes/Sofa.obj", "./textures/sofa.png", new Collider(sofaPos + washroomCabinetCol_01,sofaPos - washroomCabinetCol_01)},
+=======
+>>>>>>> Stashed changes
         Actor{ 0,90, smallTablePos, Vec3{0.009f,0.009f,0.009f}, "./meshes/Table.obj", "./textures/wood.png", new Collider(smallTablePos + smallTableCol,smallTablePos - smallTableCol)},
         Actor{ 0,-90, cabinetPos, Vec3{0.012f,0.012f,0.012f}, "./meshes/Cabinet.obj", "./textures/chair.png", new Collider(cabinetPos + washroomCabinetCol_01,cabinetPos - washroomCabinetCol_01)},
 
         //Bedroom
+<<<<<<< Updated upstream
         Actor{ 0,-90, bedPos, Vec3{0.01f,0.01f,0.01f}, "./meshes/Bed.obj", "./textures/bed.png", new Collider(bedPos + bedCol,bedPos - bedCol)},
+=======
+>>>>>>> Stashed changes
         Actor{ 0,90, nightstandPos_01, Vec3{0.009f,0.009f,0.009f}, "./meshes/Night_Stand.obj", "./textures/wood.png", new Collider(nightstandPos_01 + washroomCabinetCol_01,nightstandPos_01 - washroomCabinetCol_01)},
         Actor{ 0,90, nightstandPos_02, Vec3{0.009f,0.009f,0.009f}, "./meshes/Night_Stand.obj", "./textures/wood.png", new Collider(nightstandPos_02 + washroomCabinetCol_01,nightstandPos_02 - washroomCabinetCol_01)},
         Actor{ 0,0, deskPos, Vec3{0.2f,0.2f,0.2f}, "./meshes/Desk.obj", "./textures/desk.png", new Collider(deskPos + deskCol,deskPos - deskCol)},
         Actor{ 0,180, TVStandRoomPos, Vec3{0.009f,0.009f,0.009f}, "./meshes/TVStand.obj", "./textures/TVStand.png", new Collider(TVStandRoomPos + washroomCabinetCol_02,TVStandRoomPos - washroomCabinetCol_02)},
         Actor{0,0, gamecubeRoomPos, Vec3{.0015f,.0015f,.0015f}, "./meshes/Gamecube.obj", "./textures/gamecube.png", new Collider(gamecubeRoomPos + gamecubeCol,gamecubeRoomPos - gamecubeCol)},
+<<<<<<< Updated upstream
         Actor{ 0,180, sofaRoomPos, Vec3{0.005f,0.005f,0.005f}, "./meshes/Sofa.obj", "./textures/sofa.png", new Collider(sofaRoomPos + washroomCabinetCol_02,sofaRoomPos - washroomCabinetCol_02)},
 
+=======
+        
+>>>>>>> Stashed changes
         //Floor
         Actor{0,0, floorPos, Vec3{100.0f,0.001f,100.0f}, "./meshes/cube.obj", "./textures/wood.png", new Collider(floorPos + floorCol,floorPos - floorCol)},
 
@@ -586,12 +613,12 @@ public:
         Actor{ 0,180, cornerPos_00, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_Corner_02.obj", "./textures/wall.png" },
 
         Actor{0,-90, innerWallPos_01, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_02.obj", "./textures/wall.png", new Collider(innerWallPos_01 + innerWallCol_04 + innerWallOffset_04,innerWallPos_01 - innerWallCol_04 + innerWallOffset_04)},
-        
+
         Actor{0,-90, cornerPos_01, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_Corner_01.obj", "./textures/wall.png", new Collider(cornerPos_01 + cornerCol + cornerOffset_04,cornerPos_01 - cornerCol + cornerOffset_04)},
         Actor{0,180, cornerPos_02, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_Corner_01.obj", "./textures/wall.png", new Collider(cornerPos_02 + cornerCol + cornerOffset_03,cornerPos_02 - cornerCol + cornerOffset_03)},
 
         Actor{0,90, innerWallPos_02, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_02.obj", "./textures/wall.png", new Collider(innerWallPos_02 + innerWallCol_02 + innerWallOffset_02,innerWallPos_02 - innerWallCol_02 + innerWallOffset_02)},
-        
+
         Actor{0,90, cornerPos_03, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_Corner_02.obj", "./textures/wall.png"},
 
         Actor{0,180, innerWallPos_03, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_02.obj", "./textures/wall.png", new Collider(innerWallPos_03 + innerWallCol_03 + innerWallOffset_03,innerWallPos_03 - innerWallCol_03 + innerWallOffset_03)},
@@ -610,17 +637,17 @@ public:
         Actor{0,180, innerWallPos_06, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_02.obj", "./textures/wall.png", new Collider(innerWallPos_06 + innerWallCol_03 + innerWallOffset_03,innerWallPos_06 - innerWallCol_03 + innerWallOffset_03)},
 
         Actor{0,180, cornerPos_08, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_Corner_02.obj", "./textures/wall.png"},
-        
+
         Actor{0,-90, innerWallPos_07, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_02.obj", "./textures/wall.png", new Collider(innerWallPos_07 + innerWallCol_04 + innerWallOffset_04,innerWallPos_07 - innerWallCol_04 + innerWallOffset_04)},
         Actor{0,-90, innerWallPos_08, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_01.obj", "./textures/wall.png", new Collider(innerWallPos_08 + innerWallCol_08 + innerWallOffset_08,innerWallPos_08 - innerWallCol_08 + innerWallOffset_08)},
         Actor{0,-90, innerWallPos_09, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_02.obj", "./textures/wall.png", new Collider(innerWallPos_09 + innerWallCol_04 + innerWallOffset_04,innerWallPos_09 - innerWallCol_04 + innerWallOffset_04)},
-        
+
         Actor{0,-90, cornerPos_09, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_Corner_02.obj", "./textures/wall.png"},
 
         Actor{0,0, innerWallPos_10, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_02.obj", "./textures/wall.png", new Collider(innerWallPos_10 + innerWallCol_01 + innerWallOffset_01,innerWallPos_10 - innerWallCol_01 + innerWallOffset_01)},
 
         Actor{0,0, cornerPos_10, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_Corner_02.obj", "./textures/wall.png"},
-        
+
         Actor{0,90, innerWallPos_11, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_01.obj", "./textures/wall.png", new Collider(innerWallPos_11 + innerWallCol_06 + innerWallOffset_06,innerWallPos_11 - innerWallCol_06 + innerWallOffset_06)},
 
         Actor{0,90, cornerPos_11, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_Corner_01.obj", "./textures/wall.png", new Collider(cornerPos_11 + cornerCol + cornerOffset_02,cornerPos_11 - cornerCol + cornerOffset_02)},
@@ -655,9 +682,9 @@ public:
         Actor{ 0,90, innerWallPos_24, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_02.obj", "./textures/wall.png", new Collider(innerWallPos_24 + innerWallCol_02 + innerWallOffset_02,innerWallPos_24 - innerWallCol_02 + innerWallOffset_02) },
 
         Actor{ 0,90, cornerPos_19, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_Corner_02.obj", "./textures/wall.png"},
-        
+
         Actor{ 0,180, innerWallPos_25, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_02.obj", "./textures/wall.png", new Collider(innerWallPos_25 + innerWallCol_03 + innerWallOffset_03,innerWallPos_25 - innerWallCol_03 + innerWallOffset_03) },
-        
+
         Actor{ 0,180, cornerPos_20, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_Corner_01.obj", "./textures/wall.png", new Collider(cornerPos_20 + cornerCol + cornerOffset_03,cornerPos_20 - cornerCol + cornerOffset_03) },
         Actor{ 0,90, cornerPos_21, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_Corner_01.obj", "./textures/wall.png", new Collider(cornerPos_21 + cornerCol + cornerOffset_02,cornerPos_21 - cornerCol + cornerOffset_02) },
 
@@ -672,14 +699,14 @@ public:
         Actor{ 0,-90, innerWallPos_31, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_02.obj", "./textures/wall.png", new Collider(innerWallPos_31 + innerWallCol_04 + innerWallOffset_04,innerWallPos_31 - innerWallCol_04 + innerWallOffset_04) },
 
         Actor{ 0,-90, cornerPos_23, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_Corner_02.obj", "./textures/wall.png" },
-        
+
         Actor{ 0,0, innerWallPos_32, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_02.obj", "./textures/wall.png", new Collider(innerWallPos_32 + innerWallCol_01 + innerWallOffset_01,innerWallPos_32 - innerWallCol_01 + innerWallOffset_01) },
         Actor{ 0,0, innerWallPos_33, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_02.obj", "./textures/wall.png", new Collider(innerWallPos_33 + innerWallCol_01 + innerWallOffset_01,innerWallPos_33 - innerWallCol_01 + innerWallOffset_01) },
         Actor{ 0,0, innerWallPos_34, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_02.obj", "./textures/wall.png", new Collider(innerWallPos_34 + innerWallCol_01 + innerWallOffset_01,innerWallPos_34 - innerWallCol_01 + innerWallOffset_01) },
         Actor{ 0,0, innerWallPos_35, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_02.obj", "./textures/wall.png", new Collider(innerWallPos_35 + innerWallCol_01 + innerWallOffset_01,innerWallPos_35 - innerWallCol_01 + innerWallOffset_01) },
 
         Actor{ 0,0, cornerPos_24, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_Corner_02.obj", "./textures/wall.png" },
-           
+
         Actor{ 0,90, innerWallPos_36, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_02.obj", "./textures/wall.png", new Collider(innerWallPos_36 + innerWallCol_02 + innerWallOffset_02,innerWallPos_36 - innerWallCol_02 + innerWallOffset_02) },
         Actor{ 0,90, innerWallPos_37, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_02.obj", "./textures/wall.png", new Collider(innerWallPos_37 + innerWallCol_02 + innerWallOffset_02,innerWallPos_37 - innerWallCol_02 + innerWallOffset_02) },
         Actor{ 0,90, innerWallPos_38, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_02.obj", "./textures/wall.png", new Collider(innerWallPos_38 + innerWallCol_02 + innerWallOffset_02,innerWallPos_38 - innerWallCol_02 + innerWallOffset_02) },
@@ -698,72 +725,67 @@ public:
         Actor{ 0,90, cornerPos_27, Vec3{0.0075f,0.0075f,0.0075f}, "./meshes/Wall_Corner_02.obj", "./textures/wall.png" },
     };
 
-    std::array<Actor, 37> actors2 = {
+    std::map<std::string,Actor> actors2 = {
 
-        //House - 0
-        Actor{0,0, housePos, Vec3{0.01f,0.01f,0.01f}, "./meshes/Sphere.obj", "./textures/wood.png", new Collider(Vec3(3.3f, 4.3f, 1.3f), Vec3(-3.3f, -2.3f, -5.3f))},
+        {"col-1", Actor{0,0, doorPost2Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(doorPost2Pos + invisibleOffset,tubeCol)}},
+        {"bushes", Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Bushes.obj", "./textures/leaf.png"},
+        {"chair-cloth", Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Out_Chairs.obj", "./textures/chair_cloth.png"},
+        {"wall", Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Front_Wall.obj", "./textures/front_wall.png"},
+        {"grass", Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Grass.obj", "./textures/leaf.png"},
+        {"land", Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Land.obj", "./textures/land.png"},
+        {"frame", Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Main_Frame.obj", "./textures/wood.png"},
+        {"roof-1", Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Overroof.obj", "./textures/brick.png"},
+        {"palm-1", Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Palms1.obj", "./textures/wood.png"},
+        {"palm-2", Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Palms2.obj", "./textures/leaf.png"},
+        {"palm-3", Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Palms3.obj", "./textures/leaf.png"},
+        {"rock", Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Rocks.obj", "./textures/rock.png"},
+        {"roof-2", Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Roof.obj", "./textures/brick.png"},
+        {"chair-border", Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Trunk_Chairs.obj", "./textures/wood.png"},
+        {"vent", Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Vent.obj", "./textures/metal.png"},
+        {"walls", Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Walls.obj", "./textures/front_wall.png"},
+        {"window", Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Windows.obj", "./textures/glass.png", new Collider(outerWindowPos + outerWindowCol + invisibleOffset,outerWindowPos - outerWindowCol + invisibleOffset)}},
 
         //House Door - 1
-        Actor{0,0, houseDoorPos, Vec3{.009f,.01f,.009f}, "./meshes/Door.obj", "./textures/door.png", new Collider(houseDoorPos + houseDoorCol + houseDoorOffset,houseDoorPos - houseDoorCol + houseDoorOffset)},
+        {"door" , Actor{0,0, houseDoorPos, Vec3{.009f,.01f,.009f}, "./meshes/Door.obj", "./textures/door.png", new Collider(houseDoorPos + houseDoorCol + houseDoorOffset,houseDoorPos - houseDoorCol + houseDoorOffset)}},
 
         //Chair 1 - 2
-        Actor{0,6, outerChair1Pos, Vec3{0.5f,0.6f,1.0f}, "./meshes/Cube.obj", "./textures/door.png", new Collider(outerChair1Pos + outerChair1Col + invisibleOffset,outerChair1Pos - outerChair1Col + invisibleOffset)},
+        {"chair-1" , Actor{0,6, outerChair1Pos, Vec3{0.5f,0.6f,1.0f}, "./meshes/Cube.obj", "./textures/door.png", new Collider(outerChair1Pos + outerChair1Col + invisibleOffset,outerChair1Pos - outerChair1Col + invisibleOffset)}},
 
         //Chair 2 - 3
-        Actor{0,30, outerChair2Pos, Vec3{0.5f,0.6f,1.0f}, "./meshes/Cube.obj", "./textures/door.png", new Collider(outerChair2Pos + outerChair2Col + invisibleOffset,outerChair2Pos - outerChair2Col + invisibleOffset)},
-
+        {"chair-2" , Actor{0,30, outerChair2Pos, Vec3{0.5f,0.6f,1.0f}, "./meshes/Cube.obj", "./textures/door.png", new Collider(outerChair2Pos + outerChair2Col + invisibleOffset,outerChair2Pos - outerChair2Col + invisibleOffset)}},
+       
         //Tree 1
-        Actor{0,0, tree1_1Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree1_1Pos + invisibleOffset,tubeCol)},
-        Actor{0,0, tree1_2Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree1_2Pos + invisibleOffset,tubeCol)},
-        Actor{0,0, tree1_3Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree1_3Pos + invisibleOffset,tubeCol)},
+        {"tree-1.1" , Actor{0,0, tree1_1Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree1_1Pos + invisibleOffset,tubeCol)}},
+        {"tree-1.2" , Actor{0,0, tree1_2Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree1_2Pos + invisibleOffset,tubeCol)}},
+        {"tree-1.3" , Actor{0,0, tree1_3Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree1_3Pos + invisibleOffset,tubeCol)}},
 
         //Tree 2
-        Actor{0,0, tree2_1Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_1Pos + invisibleOffset,tubeCol)},
-        Actor{0,0, tree2_2Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_2Pos + invisibleOffset,tubeCol)},
-        Actor{0,0, tree2_3Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_3Pos + invisibleOffset,tubeCol)},
-        Actor{0,0, tree2_4Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_4Pos + invisibleOffset,tubeCol)},
-        Actor{0,0, tree2_5Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_5Pos + invisibleOffset,tubeCol)},
-        Actor{0,0, tree2_6Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_6Pos + invisibleOffset,tubeCol)},
-        Actor{0,0, tree2_7Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_7Pos + invisibleOffset,tubeCol)},
-        Actor{0,0, tree2_8Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_8Pos + invisibleOffset,tubeCol)},
-        Actor{0,0, tree2_9Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_9Pos + invisibleOffset,tubeCol)},
+        {"tree-2.1" , Actor{0,0, tree2_1Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_1Pos + invisibleOffset,tubeCol)}},
+        {"tree-2.2" , Actor{0,0, tree2_2Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_2Pos + invisibleOffset,tubeCol)}},
+        {"tree-2.3" , Actor{0,0, tree2_3Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_3Pos + invisibleOffset,tubeCol)}},
+        {"tree-2.4" , Actor{0,0, tree2_4Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_4Pos + invisibleOffset,tubeCol)}},
+        {"tree-2.5" , Actor{0,0, tree2_5Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_5Pos + invisibleOffset,tubeCol)}},
+        {"tree-2.6" , Actor{0,0, tree2_6Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_6Pos + invisibleOffset,tubeCol)}},
+        {"tree-2.7" , Actor{0,0, tree2_7Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_7Pos + invisibleOffset,tubeCol)}},
+        {"tree-2.8" , Actor{0,0, tree2_8Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_8Pos + invisibleOffset,tubeCol)}},
+        {"tree-2.9" , Actor{0,0, tree2_9Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree2_9Pos + invisibleOffset,tubeCol)}},
 
         //Tree 3
-        Actor{0,0, tree3_1Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree3_1Pos + invisibleOffset,tubeCol)},
-        Actor{0,0, tree3_2Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree3_2Pos + invisibleOffset,tubeCol)},
-        Actor{0,0, tree3_3Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree3_3Pos + invisibleOffset,tubeCol)},
+        {"tree-3.1" , Actor{0,0, tree3_1Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree3_1Pos + invisibleOffset,tubeCol)}},
+        {"tree-3.2" , Actor{0,0, tree3_2Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree3_2Pos + invisibleOffset,tubeCol)}},
+        {"tree-3.3" , Actor{0,0, tree3_3Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(tree3_3Pos + invisibleOffset,tubeCol)}},
 
         //Door Post 1
-        Actor{0,0, doorPost1Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(doorPost1Pos + invisibleOffset,tubeCol)},
+        {"post-1" , Actor{0,0, doorPost1Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(doorPost1Pos + invisibleOffset,tubeCol)}},
 
         //Door Post 2
-        Actor{0,0, doorPost2Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(doorPost2Pos + invisibleOffset,tubeCol)},
-        
-        //House
-        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Bushes.obj", "./textures/leaf.png",
-        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Out_Chairs.obj", "./textures/chair_cloth.png",
-        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Front_Wall.obj", "./textures/front_wall.png",
-        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Grass.obj", "./textures/leaf.png",
-        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Land.obj", "./textures/land.png",
-        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Main_Frame.obj", "./textures/wood.png",
-        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Overroof.obj", "./textures/brick.png",
-        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Palms1.obj", "./textures/wood.png",
-        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Palms2.obj", "./textures/leaf.png",
-        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Palms3.obj", "./textures/leaf.png",
-        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Rocks.obj", "./textures/rock.png",
-        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Roof.obj", "./textures/brick.png",
-        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Trunk_Chairs.obj", "./textures/wood.png",
-        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Vent.obj", "./textures/metal.png",
-        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Walls.obj", "./textures/front_wall.png",
-        Actor{0,0, housePos, Vec3{3.0f,3.0f,3.0f}, "./meshes/Windows.obj", "./textures/glass.png", new Collider(outerWindowPos + outerWindowCol + invisibleOffset,outerWindowPos - outerWindowCol + invisibleOffset)},
+        {"post-2" , Actor{0,0, doorPost2Pos, Vec3{0.25f,0.25f,0.25f}, "./meshes/Cube.obj", "./textures/chair.png", new Collider(doorPost2Pos + invisibleOffset,tubeCol)}},
 
-        //Skybox
-        //Actor{0,0, skyboxUp, Vec3{100.0f,0.001f,100.0f}, "./meshes/Cube.obj", "./textures/glass.png"},
-        //Actor{0,0, skyboxFront, Vec3{100.0f,100.0f,0.001f}, "./meshes/Cube.obj", "./textures/glass.png"},
-        //Actor{0,0, skyboxBack, Vec3{100.0f,100.0f,0.001f}, "./meshes/Cube.obj", "./textures/glass.png"},
-        //Actor{0,0, skyboxLeft, Vec3{0.001f,100.0f,100.0f}, "./meshes/Cube.obj", "./textures/glass.png"},
-        //Actor{0,0, skyboxRight, Vec3{0.001f,100.0f,100.0f}, "./meshes/Cube.obj", "./textures/glass.png"},
+        {"sea" , Actor{0,0, Vec3{0,-1.5f,0}, Vec3{100.0f,0.1f,100.0f}, "./meshes/Cube.obj", "./textures/Ocean.jpg", new Collider(doorPost2Pos + invisibleOffset,tubeCol)}},
     };
+
+    std::map<std::string, VkImage> textures = {};
+    std::map<std::string, IndexedBufferMemory> models = {};
         
 private:
     const size_t MAX_FRAMES_IN_FLIGHT = 2;
@@ -785,6 +807,8 @@ private:
     
     VkPipelineLayout pipelineLayout;
     VkPipeline graphicsPipelineID;
+    VkPipelineLayout pipelineLayout1;
+    VkPipeline graphicsPipelineID1;
 
     int descriptorSetsArrayIndex = 0;
 

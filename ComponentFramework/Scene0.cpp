@@ -82,9 +82,24 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 				light = !light;
 				engine->play2D("./audio/lamp.wav");
 			}
-			if(cameraPosition->actionCollider->isColliding(*vRenderer->actors[0].collider)){
-				sit = !sit;
+			for (int i = 9; i <= 13; i++) {
+				if (cameraPosition->actionCollider->isColliding(*vRenderer->actors[i].collider)) {
+					sit = !sit;
+					if (sit)
+						chair = i;
+				}
 			}
+			
+			if (cameraPosition->actionCollider->isColliding(*vRenderer->actors[0].collider)) {
+				sit = !sit;
+				if (sit)
+					chair = 0;
+			}
+
+			if (cameraPosition->actionCollider->isColliding(*vRenderer->actors[14].collider)) {
+				sleep = !sleep;
+			}
+
 			if(cameraPosition->actionCollider->isColliding(*vRenderer->actors[4].collider)){
 				sceneManager->ChangeScene(SceneManager::SCENE_NUMBER::SCENE1);
 				return;
@@ -101,6 +116,14 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 			}
 			if(cameraPosition->actionCollider->isColliding(*vRenderer->actors[7].collider)){
 				danny = !danny;
+			}
+			if (cameraPosition->actionCollider->isColliding(*vRenderer->actors[3].collider)) {
+				doorOpen = !doorOpen;
+				if (doorIsClosed)
+					engine->play2D("./audio/doorOpen.wav");
+				if (!doorIsClosed)
+					engine->play2D("./audio/doorClose.wav");
+				vRenderer->actors[3].collider->setActive(false);
 			}
 			break;
 		case SDL_SCANCODE_F:
@@ -157,9 +180,8 @@ void Scene0::HandleEvents(const SDL_Event& sdlEvent) {
 		case SDL_WINDOWEVENT_SIZE_CHANGED:
 			printf("size changed %d %d\n", sdlEvent.window.data1, sdlEvent.window.data2);
 			aspectRatio = static_cast<float>(sdlEvent.window.data1) / static_cast<float>(sdlEvent.window.data2);
-			camera->Perspective(fovy, aspectRatio, 0.5f, 40.0f);
+			camera->Perspective(fovy, aspectRatio, 0.5f, 90.0f);
 			break;
-
 		}
 		break;
 	}
@@ -176,11 +198,16 @@ void Scene0::Update(const float deltaTime) {
 
 	static float elapsedTime = 0.0f;
 	elapsedTime += deltaTime;
-	if(!sit){
-		float fb = (front ? 0.1 : 0 + back ? -0.1 : 0) * 0.01;
+	if(!sit && !sleep){
+		float fb = (front ? 0.125f : 0 + back ? -0.075f : 0) * 0.01;
 		float lr = (right ? 0.1 : 0 + left ? -0.1 : 0) * 0.01;
-		Vec3 newPos = cameraPosition->position + (Vec3(-sin(cameraPosition->gamma * deg2rad),0,cos(cameraPosition->gamma * deg2rad)) * rad2deg * fb)
-			+ (Vec3(-sin((90 + cameraPosition->gamma) * deg2rad), 0, cos((90 + cameraPosition->gamma) * deg2rad)) * rad2deg * lr);
+		Vec3 movement = (
+			Vec3(-sin(cameraPosition->gamma * deg2rad), 0, cos(cameraPosition->gamma * deg2rad)) * rad2deg * fb)
+			+ (
+				Vec3(-sin((90 + cameraPosition->gamma) * deg2rad), 0, cos((90 + cameraPosition->gamma) * deg2rad)) * rad2deg * lr);
+		if (MATH::VMath::mag(movement) > 0.001f)
+			movement = MATH::VMath::normalize(movement) * speed; 
+		Vec3 newPos = cameraPosition->position + movement;
 		Collider temp = *cameraPosition->collider;
 		temp.setPosition(Vec3{-newPos.x, -newPos.y, -newPos.z});
 		bool is_colliding = false;
@@ -220,11 +247,11 @@ void Scene0::Update(const float deltaTime) {
 
 	if (zoom && fovy > 25) {
 		fovy-= 0.9;
-		camera->Perspective(fovy, aspectRatio, 0.5f, 40.0f);
+		camera->Perspective(fovy, aspectRatio, 0.5f, 90.0f);
 	}
 	if (!zoom && fovy < 45.0f) {
-		fovy+= 0.8;
-		camera->Perspective(fovy, aspectRatio, 0.5f, 40.0f);
+		fovy+= 0.9;
+		camera->Perspective(fovy, aspectRatio, 0.5f, 90.0f);
 	}
 
 	cameraPosition->gamma += lookLeft ? -2 : 0 + lookRight ? 2 : 0;
@@ -244,22 +271,27 @@ void Scene0::setMatrix(Actor* a) const{
 
 void Scene0::Render() const {
 
-	GlobalLighting gl = GlobalLighting{ { LightUBO{ Vec4(0.0f, 5.0f, 0.0f, 1.0f), Vec4(1, 1, 1, 1) } }, 1, 0, distort };
+	GlobalLighting gl = GlobalLighting{ { LightUBO{ Vec4{0.0f, 5.0f, 0.0f, 1.0f}, Vec4{0.75, 0.70, 0.70, 1}}}, 1, 0, distort };
 
 	for (int i = 0; i < vRenderer->actors.size(); i++)
 	{
 		setMatrix(&vRenderer->actors[i]);
 	}
 
-	if(!sit) {
-		vRenderer->SetCameraUBO(camera->GetProjectionMatrix(),   MMath::rotate(cameraPosition->theta,Vec3(1,0,0)) 
-																* MMath::rotate(cameraPosition->gamma, 0, 1, 0) 
-																* MMath::translate(cameraPosition->position), -cameraPosition->position) ;
+	if(sit) {
+		vRenderer->SetCameraUBO(camera->GetProjectionMatrix(), MMath::rotate(cameraPosition->theta, Vec3(1, 0, 0))
+			* MMath::rotate(cameraPosition->gamma, 0, 1, 0)
+			* MMath::translate(Vec3{ -vRenderer->actors[chair].position.x, cameraPosition->position.y - 0.0f, -vRenderer->actors[chair].position.z }), cameraPosition->position);
+	}
+	else if (sleep) {
+		vRenderer->SetCameraUBO(camera->GetProjectionMatrix(), MMath::rotate(-30, Vec3(1, 0, 0))
+			* MMath::rotate(-90, 0, 1, 0)
+			* MMath::translate(Vec3{ -vRenderer->actors[14].position.x, cameraPosition->position.y + 0.5f, -vRenderer->actors[14].position.z }), cameraPosition->position);
 	}
 	else {
-		vRenderer->SetCameraUBO(camera->GetProjectionMatrix(),    MMath::rotate(cameraPosition->theta,Vec3(1,0,0)) 
-																* MMath::rotate(cameraPosition->gamma, 0, 1, 0) 
-																* MMath::translate(Vec3{-vRenderer->actors[0].position.x, cameraPosition->position.y - 0.0f, -vRenderer->actors[0].position.z}), cameraPosition->position);
+		vRenderer->SetCameraUBO(camera->GetProjectionMatrix(), MMath::rotate(cameraPosition->theta, Vec3(1, 0, 0))
+			* MMath::rotate(cameraPosition->gamma, 0, 1, 0)
+			* MMath::translate(cameraPosition->position), -cameraPosition->position);
 	}
 
 	vRenderer->SetModelMatrixPush(&vRenderer->actors[6], MMath::translate(-vRenderer->pi.pos)
@@ -270,7 +302,7 @@ void Scene0::Render() const {
 	vRenderer->commitFrame();
 
 	if(light){
-		gl = GlobalLighting{ { LightUBO{ Vec4(0.0f, 5.0f, 0.0f, 1.0f), Vec4(1, 1, 1, 1) },
+		gl = GlobalLighting{ { LightUBO{ Vec4(0.0f, 5.0f, 0.0f, 1.0f),Vec4(1, 1, 1, 1) },
 							   LightUBO{ Vec4(vRenderer->actors[1].position, 1), Vec4(0.3, 0.3, 0.3, 1)} }, 2, 0, distort };
 	}
 

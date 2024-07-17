@@ -1,3 +1,7 @@
 [INFO]: Starting the GameSceneManager
 [INFO]: Created Scene0: 
 [INFO]: Created Scene1: 
+<<<<<<< Updated upstream
+=======
+[INFO]: Deleting the GameSceneManager
+>>>>>>> Stashed changes

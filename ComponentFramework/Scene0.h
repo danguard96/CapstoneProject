@@ -27,6 +27,7 @@ private:
 	IA ai;
 	const float deg2rad = M_PI / 180;
 	const float rad2deg = 180 / M_PI;
+	float speed = 0.1;
 	CameraPosition *cameraPosition;
 	Renderer *renderer;
 	Camera *camera;
@@ -35,7 +36,9 @@ private:
 	Matrix4 SphereRotationMatrix;
 	int skin = 0;
 	bool light = false;
+	bool sleep = false;
 	bool sit = false;
+	int chair = -1;
 	bool music = false;
 	bool doorOpen = false;
 	bool doorIsClosed = true;

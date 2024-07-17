@@ -75,6 +75,9 @@
     <ClCompile Include="ServerNetworkManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Actor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Debug.h">
@@ -166,13 +169,10 @@
     <None Include="shaders\assignment2.frag">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="shaders\drawNormals.frag">
+    <None Include="shaders\phong.frag">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="shaders\drawNormals.geom">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="shaders\drawNormals.vert">
+    <None Include="shaders\phong.vert">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

@@ -14,6 +14,7 @@ public:
     void clearClient();
 private:
     static void sendPosition(UDPsocket udpSocket, IPaddress serverIP, CameraPosition& client);
+    static void sendMessage(UDPsocket udpSocket, IPaddress serverIP, std::string message);
     void clientSend(UDPsocket udpSocket, IPaddress* serverIP, bool& running, CameraPosition& client);
     bool parseUDPPacket(UDPsocket udpSocket, UDPpacket* packet, PlayerInfo& gameInfo);
     PlayerInfo parseData(std::string s);

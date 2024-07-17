@@ -92,6 +92,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>C:\Users\andre\Downloads\include\single_include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\GameDev\IrrKlang\lib;C:\GameDev\OpenGL\lib;C:\GameDev\SDL\lib;C:\GameDev\Vulkan\Lib32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -145,6 +146,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Actor.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="Hash.cpp" />
@@ -164,6 +166,10 @@
     <ClInclude Include="Actor.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraPosition.h" />
+<<<<<<< Updated upstream
+=======
+    <ClInclude Include="CamPos.h" />
+>>>>>>> Stashed changes
     <ClInclude Include="Collider.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="GlobalLighting.h" />
@@ -192,9 +198,8 @@
   <ItemGroup>
     <None Include="shaders\assignment2.frag" />
     <None Include="shaders\assignment2.vert" />
-    <None Include="shaders\drawNormals.frag" />
-    <None Include="shaders\drawNormals.geom" />
-    <None Include="shaders\drawNormals.vert" />
+    <None Include="shaders\phong.frag" />
+    <None Include="shaders\phong.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

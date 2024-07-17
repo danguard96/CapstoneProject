@@ -49,6 +49,13 @@ namespace  MATH {
 			m[3] = x3;   m[7] = y3;   m[11] = z3; m[15] = w3;
 		}
 
+		inline explicit Matrix4(Vec4 x, Vec4 y, Vec4 z, Vec4 w) {
+			m[0] = x.x;   m[4] = y.x;   m[8 ] = z.x; m[12] = w.x;
+			m[1] = x.y;   m[5] = y.y;   m[9 ] = z.y; m[13] = w.y;
+			m[2] = x.z;   m[6] = y.z;   m[10] = z.z; m[14] = w.z;
+			m[3] = x.w;   m[7] = y.w;   m[11] = z.w; m[15] = w.w;
+		}
+
 		/// Create the unit matrix probably the most common way of initializing a matrix
 		inline Matrix4() {
 				loadIdentity();

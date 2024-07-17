@@ -90,15 +90,19 @@ void SceneManager::GetEvents() {
 	SDL_Event sdlEvent;
 	while (SDL_PollEvent(&sdlEvent)) {
 		if (sdlEvent.type == SDL_EventType::SDL_QUIT) {
+			if (rendererType == RendererType::VULKAN) {
+				VulkanRenderer* vRenderer = dynamic_cast<VulkanRenderer*>(renderer);
+				vRenderer->stopRunning();
+			}
 			isRunning = false;
 			return;
 		}
 		else if (sdlEvent.type == SDL_KEYDOWN) {
 			switch (sdlEvent.key.keysym.scancode) {
 			case SDL_SCANCODE_ESCAPE:
-			/*case SDL_SCANCODE_Q:
+			case SDL_SCANCODE_Q:
 				isRunning = false;
-				return;*/
+				return;
 
 			case SDL_SCANCODE_F1:
 				if(rendererType == RendererType::VULKAN){

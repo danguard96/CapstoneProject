@@ -5,34 +5,58 @@ layout (location = 0) in  vec4 vVertex;
 layout (location = 1) in  vec4 vNormal;
 layout (location = 2) in  vec2 texCoords;
 
-struct lightUBO{
-	vec4 position;
-	vec4 diffuse;
-};
-
 layout(binding = 0) uniform CameraUBO {
-    mat4 model;
     mat4 view;
     mat4 proj;
+	vec3 viewPos;
 } ubo;
 
-layout(binding = 1) uniform GlobalLightingUBO {
-	lightUBO lights[];
-	int numLights;
-} glights;
+layout( push_constant ) uniform ModelMatrixPushConst {
+	mat4 modelMatrix;
+    mat4 normalMatrix;
+} Matrix;
 
 layout (location = 0) out vec3 vertNormal;
-layout (location = 1) out vec3 eyeDir; 
-layout (location = 2) out vec2 fragTextCords;
-layout (location = 3) out vec3 vertPos;
+layout (location = 1) out vec2 fragTextCords;
+layout (location = 2) out vec3 FragPos;
+layout (location = 3) out vec3 viewPos;
+
+//pink noise
+
+float mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
+vec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
+vec4 perm(vec4 x){return mod289(((x * 34.0) + 1.0) * x);}
+
+float noise(vec3 p){
+    vec3 a = floor(p);
+    vec3 d = p - a;
+    d = d * d * (3.0 - 2.0 * d);
+
+    vec4 b = a.xxyy + vec4(0.0, 1.0, 0.0, 1.0);
+    vec4 k1 = perm(b.xyxy);
+    vec4 k2 = perm(k1.xyxy + b.zzww);
+
+    vec4 c = k2 + a.zzzz;
+    vec4 k3 = perm(c);
+    vec4 k4 = perm(c + 1.0);
+
+    vec4 o1 = fract(k3 * (1.0 / 41.0));
+    vec4 o2 = fract(k4 * (1.0 / 41.0));
+
+    vec4 o3 = o2 * d.z + o1 * (1.0 - d.z);
+    vec2 o4 = o3.yw * d.x + o3.xz * (1.0 - d.x);
+
+    return o4.y * d.y + o4.x * (1.0 - d.y);
+}
+
 
 void main() {
 	fragTextCords = texCoords;
-	mat3 normalMatrix = mat3(inverse(transpose(ubo.model)));
-	vertNormal = normalize(normalMatrix * vNormal.xyz); /// Rotate the normal to the correct orientation 
-	vertPos = vec3(ubo.view * ubo.model * vVertex); /// This is the position of the vertex from the origin
-	vec3 vertDir = normalize(vertPos);
-	eyeDir = -vertDir;
+	vertNormal = vNormal.xyz;
+    vec4 vVertex1 = vec4(vVertex.x, vVertex.y, vVertex.z, 1);
+	FragPos = vec3(Matrix.modelMatrix * vVertex1);
+    
+	viewPos = ubo.viewPos;
 	
-	gl_Position =  ubo.proj * ubo.view * ubo.model * vVertex; 
+	gl_Position =  ubo.proj * ubo.view * Matrix.modelMatrix * vVertex1; 
 }

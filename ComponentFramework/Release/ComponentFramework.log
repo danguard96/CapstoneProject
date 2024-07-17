@@ -1,0 +1,22 @@
+﻿  Camera.cpp
+  Debug.cpp
+  Hash.cpp
+  NetworkManager.cpp
+C:\Users\andre\OneDrive\Escritorio\CapstoneProject\ComponentFramework\NetworkManager.h(2,10): fatal  error C1083: Cannot open include file: 'SDL_net.h': No such file or directory
+  OpenGLRenderer.cpp
+C:\Users\andre\OneDrive\Escritorio\CapstoneProject\ComponentFramework\Renderer.h(3,10): fatal  error C1083: Cannot open include file: 'SDL.h': No such file or directory
+  Scene1.cpp
+C:\Users\andre\OneDrive\Escritorio\CapstoneProject\ComponentFramework\Scene1.cpp(1,10): fatal  error C1083: Cannot open include file: 'glew.h': No such file or directory
+  Main.cpp
+C:\Users\andre\OneDrive\Escritorio\CapstoneProject\ComponentFramework\Renderer.h(3,10): fatal  error C1083: Cannot open include file: 'SDL.h': No such file or directory
+  MMath.cpp
+  Scene0.cpp
+C:\Users\andre\OneDrive\Escritorio\CapstoneProject\ComponentFramework\Scene0.h(3,10): fatal  error C1083: Cannot open include file: 'glew.h': No such file or directory
+  SceneManager.cpp
+C:\Users\andre\OneDrive\Escritorio\CapstoneProject\ComponentFramework\SceneManager.cpp(1,10): fatal  error C1083: Cannot open include file: 'SDL.h': No such file or directory
+  ServerNetworkManager.cpp
+  Timer.cpp
+C:\Users\andre\OneDrive\Escritorio\CapstoneProject\ComponentFramework\Timer.cpp(1,10): fatal  error C1083: Cannot open include file: 'SDL.h': No such file or directory
+  VMath.cpp
+  VulkanRenderer.cpp
+C:\Users\andre\OneDrive\Escritorio\CapstoneProject\ComponentFramework\VulkanRenderer.h(4,10): fatal  error C1083: Cannot open include file: 'SDL.h': No such file or directory

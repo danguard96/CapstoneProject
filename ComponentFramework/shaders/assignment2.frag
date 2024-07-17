@@ -29,13 +29,13 @@ vec4 CalcPointLight(LightUBO light)
 
 	vec3 lightDir = vec3(normalize(light.position - vec4(FragPos,1)));
     float diff = max(dot(norm, lightDir), 0.0);
-    vec3 reflectDir = reflect(-lightDir, norm);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 0.5);
+    vec3 reflectDir = normalize(lightDir + viewDir);
+    float spec = pow(max(dot(norm, reflectDir), 0.0), 16.0);
     float distance = length(vec3(light.position) - FragPos);
-    float attenuation = 10.0 / (1 + 0.7 * distance + 1 * (distance * distance));
-    vec3 ambient  = vec3(0.5,0.5,0.5)  * vec3(texture(texSampler, fragTextCords));
-    vec3 diffuse  = vec3(light.diffuse)  * diff * vec3(texture(texSampler, fragTextCords));
-    vec3 specular = vec3(1.0,1.0,1.0) * spec * vec3(texture(texSampler, fragTextCords));
+    float attenuation = 1.0 / distance;
+    vec3 ambient  = vec3(0.4,0.4,0.4)  * vec3(texture(texSampler, fragTextCords));
+    vec3 diffuse  = vec3(light.diffuse) * diff * pow(texture(texSampler, fragTextCords).rgb, vec3(2.2));
+    vec3 specular = vec3(1.0,1.0,1.0) * spec * pow(texture(texSampler, fragTextCords).rgb, vec3(2.2));
     ambient  *= attenuation;
     diffuse  *= attenuation;
     specular *= attenuation;

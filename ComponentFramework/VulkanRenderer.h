@@ -372,17 +372,9 @@ public:
     Vec3 dishwasherOffset = Vec3(-0.75f, 0.0f, -0.25f);
     Vec3 dishwasherCol = Vec3(0.25f, 2.0f, 0.25f);
     Vec3 tableCol = Vec3(0.25f, 2.0f, 0.75f);
-<<<<<<< Updated upstream
 
-    //Living Room
     Vec3 smallTableCol = Vec3(0.1875f, 2.0f, 0.5625f);
 
-=======
-
-    //Living Room
-    Vec3 smallTableCol = Vec3(0.1875f, 2.0f, 0.5625f);
-
->>>>>>> Stashed changes
     //Bedroom
     Vec3 bedCol = Vec3(1.0f, 2.0f, 0.75f);
     Vec3 nightstandCol = Vec3(1.0f, 2.0f, 0.75f);
@@ -561,29 +553,20 @@ public:
 
         //Living Room
         Actor{ 0,-90, TVStandPos, Vec3{0.009f,0.009f,0.009f}, "./meshes/TVStand.obj", "./textures/TVStand.png", new Collider(TVStandPos + washroomCabinetCol_01,TVStandPos - washroomCabinetCol_01)},
-<<<<<<< Updated upstream
         Actor{ 0,-90, sofaPos, Vec3{0.005f,0.005f,0.005f}, "./meshes/Sofa.obj", "./textures/sofa.png", new Collider(sofaPos + washroomCabinetCol_01,sofaPos - washroomCabinetCol_01)},
-=======
->>>>>>> Stashed changes
         Actor{ 0,90, smallTablePos, Vec3{0.009f,0.009f,0.009f}, "./meshes/Table.obj", "./textures/wood.png", new Collider(smallTablePos + smallTableCol,smallTablePos - smallTableCol)},
         Actor{ 0,-90, cabinetPos, Vec3{0.012f,0.012f,0.012f}, "./meshes/Cabinet.obj", "./textures/chair.png", new Collider(cabinetPos + washroomCabinetCol_01,cabinetPos - washroomCabinetCol_01)},
 
         //Bedroom
-<<<<<<< Updated upstream
         Actor{ 0,-90, bedPos, Vec3{0.01f,0.01f,0.01f}, "./meshes/Bed.obj", "./textures/bed.png", new Collider(bedPos + bedCol,bedPos - bedCol)},
-=======
->>>>>>> Stashed changes
         Actor{ 0,90, nightstandPos_01, Vec3{0.009f,0.009f,0.009f}, "./meshes/Night_Stand.obj", "./textures/wood.png", new Collider(nightstandPos_01 + washroomCabinetCol_01,nightstandPos_01 - washroomCabinetCol_01)},
         Actor{ 0,90, nightstandPos_02, Vec3{0.009f,0.009f,0.009f}, "./meshes/Night_Stand.obj", "./textures/wood.png", new Collider(nightstandPos_02 + washroomCabinetCol_01,nightstandPos_02 - washroomCabinetCol_01)},
         Actor{ 0,0, deskPos, Vec3{0.2f,0.2f,0.2f}, "./meshes/Desk.obj", "./textures/desk.png", new Collider(deskPos + deskCol,deskPos - deskCol)},
         Actor{ 0,180, TVStandRoomPos, Vec3{0.009f,0.009f,0.009f}, "./meshes/TVStand.obj", "./textures/TVStand.png", new Collider(TVStandRoomPos + washroomCabinetCol_02,TVStandRoomPos - washroomCabinetCol_02)},
         Actor{0,0, gamecubeRoomPos, Vec3{.0015f,.0015f,.0015f}, "./meshes/Gamecube.obj", "./textures/gamecube.png", new Collider(gamecubeRoomPos + gamecubeCol,gamecubeRoomPos - gamecubeCol)},
-<<<<<<< Updated upstream
+
         Actor{ 0,180, sofaRoomPos, Vec3{0.005f,0.005f,0.005f}, "./meshes/Sofa.obj", "./textures/sofa.png", new Collider(sofaRoomPos + washroomCabinetCol_02,sofaRoomPos - washroomCabinetCol_02)},
 
-=======
-        
->>>>>>> Stashed changes
         //Floor
         Actor{0,0, floorPos, Vec3{100.0f,0.001f,100.0f}, "./meshes/cube.obj", "./textures/wood.png", new Collider(floorPos + floorCol,floorPos - floorCol)},
 

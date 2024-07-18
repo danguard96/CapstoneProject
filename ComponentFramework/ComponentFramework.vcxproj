@@ -166,10 +166,7 @@
     <ClInclude Include="Actor.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraPosition.h" />
-<<<<<<< Updated upstream
-=======
     <ClInclude Include="CamPos.h" />
->>>>>>> Stashed changes
     <ClInclude Include="Collider.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="GlobalLighting.h" />
